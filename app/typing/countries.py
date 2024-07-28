@@ -12,3 +12,7 @@ def countries_na_typer():
 @app.route('/countries_eu_typer')
 def countries_eu_typer():
     return render_template("typing/countries/countries_eu_type.html")
+
+@app.route('/countries_sa_typer')
+def countries_sa_typer():
+    return render_template("typing/countries/countries_sa_type.html")

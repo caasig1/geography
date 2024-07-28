@@ -5,6 +5,6 @@ app.secret_key = 'caasig#1'
 
 from app import handler, main_routes
 from app.loading import load_na_subdivisions, load_countries
-from app.clicking import countries_na, subdivisions_na, countries_eu
-from app.learning import countries_na, subdivisions_na
-from app.typing import countries_na, subdivisions_na
+from app.clicking import countries, subdivisions_na
+from app.learning import countries, subdivisions_na
+from app.typing import countries, subdivisions_na

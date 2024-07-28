@@ -28,3 +28,7 @@ def countries_na():
 @app.route('/countries_eu.geojson')
 def countries_eu():
     return helper('eu')
+
+@app.route('/countries_sa.geojson')
+def countries_sa():
+    return helper('sa')
