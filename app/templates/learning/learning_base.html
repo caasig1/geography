@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% include 'head.html' %}
+        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <title>{% block title %} Geography Game {% endblock %}</title>
+    </head>
+<body>
+    {% include 'nav_bar.html' %}
+    <h1>{% block quiz %} Default Title {% endblock %}</h1>
+    <div id="map"></div>
+
+    {% include 'home/load_map.html' %}
+    <script>
+        // Load GeoJSON data
+        axios.get(geodata)
+            .then(data => {
+                data = data.data
+                // function takes data which is the geojsondata and makes a layer for it
+                // second param is the options, in this case, it is its style and onEachFeature
+                L.geoJSON(data, {
+                    style: function (feature) {
+                        return {
+                            fillColor: 'blue', // Color of the regions
+                            fillOpacity: 0.5,
+                            weight: 1,
+                            color: 'black',
+                            dashArray: '3'
+                        };
+                    },
+                    onEachFeature: function (feature, layer) {
+                        layer.bindPopup(feature.properties.name);
+
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        })
+                    }
+                }).addTo(map);
+            });
+    </script>
+</body>
+</html>

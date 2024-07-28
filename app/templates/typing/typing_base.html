@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% include 'head.html' %}
+        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <title>{% block title %} Geography Game {% endblock %}</title>
+    </head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <h1>{% block quiz %} Default Title {% endblock %}</h1>
+
+    <div id="map"></div>
+
+    {% include 'home/load_map.html' %}
+
+    <script>
+        function handleKeyPress(event){
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                submit_guess();
+            }
+        }
+
+        function submit_guess(){
+            handleEnter(document.getElementById('answer').value)
+            document.getElementById('answer').value = "";
+        }
+
+        function handleEnter(value){
+            for (let i = 0; i < store.length; i++){
+                let check = store[i];
+                for (let j = 0; j < check.accepted.length; j++){
+                    if (value.toLowerCase().replace(/\s+/g, '') === check.accepted[j].toLowerCase().replace(/\s+/g, '')){
+                        count += 1;
+                        setColor(check.layer, 'green', '', 'black');
+                        document.getElementById('total').textContent = count.toString() + ' of ' + tot + ' correct';
+                        store.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            if(store.length === 0){
+                document.getElementById('total').textContent = "Congratulations! You're done :)";
+            }
+        }
+
+    </script>
+
+    <script>
+        var stats = L.control({position: 'topleft'});
+        stats.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control');
+            div.innerHTML = `
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Guess" aria-label="Guess" aria-describedby="submit" id="answer">
+                    <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
+                </div>
+                <h2 id="total">Default</h2>
+            `
+            return div;
+        }
+        stats.addTo(map)
+        document.getElementById('answer').addEventListener('keydown', function(e) {handleKeyPress(e)})
+        document.getElementById('submit').addEventListener('click', function(e) {submit_guess()})
+    </script>
+    
+    <script>
+        var store = [];
+        var count = 0;
+        var tot = 0;
+
+        // Load GeoJSON data
+        axios.get(geodata)
+            .then(data => {
+                data = data.data
+
+                // function takes data which is the geojsondata and makes a layer for it
+                // second param is the options, in this case, it is its style and onEachFeature
+                var focus = L.geoJSON(data, {
+                    style: function (feature) {
+                        return {
+                            fillColor: 'blue', // Color of the regions
+                            fillOpacity: 0.5,
+                            weight: 1,
+                            color: 'black',
+                            dashArray: '3'
+                        };
+                    }
+                }).addTo(map);
+
+                focus.eachLayer(function(layer) {
+                    var to_add = {};
+                    to_add.layer = layer
+                    if ('accepted' in layer.feature.properties){
+                        to_add.accepted = layer.feature.properties.accepted
+                    } else {
+                        to_add.accepted = [layer.feature.properties.name]
+                    }
+                    store.push(to_add)
+                })
+                document.getElementById('answer').value = "";
+                tot = store.length.toString();
+                document.getElementById('total').textContent = count.toString() + ' of ' + tot + ' correct';
+            });
+    </script>
+</body>
+</html>

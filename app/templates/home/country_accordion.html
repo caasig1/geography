@@ -1,0 +1,59 @@
+<div class="accordion accordion-body" id="country">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#country_learning" aria-expanded="false" aria-controls="country_learning">
+                Learning
+            </button>
+        </h2>
+        <div id="country_learning" class="accordion-collapse collapse" data-bs-parent="#country">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_na_learner') }}"> North America </a> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_eu_learner') }}"> Europe </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#country_clicking" aria-expanded="false" aria-controls="country_clicking">
+                Clicking
+            </button>
+        </h2>
+        <div id="country_clicking" class="accordion-collapse collapse" data-bs-parent="#country">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_na_clicker') }}"> North America </a> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_eu_clicker') }}"> Europe </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#country_typing" aria-expanded="false" aria-controls="country_typing">
+                Typing
+            </button>
+        </h2>
+        <div id="country_typing" class="accordion-collapse collapse" data-bs-parent="#country">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_na_typer') }}"> North America </a> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_eu_typer') }}"> Europe </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% include 'head.html' %}
+        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <title>{% block title %} Geography Game {% endblock %}</title>
+    </head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <h1>{% block quiz %} Default Title {% endblock %}</h1>
+
+    <div id="map"></div>
+
+    {% include 'home/load_map.html' %}
+
+    <script>
+        var stats = L.control({position: 'topleft'});
+        stats.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control');
+            div.innerHTML = `
+                <h2 id="location">Default</h2>
+                <h2 id="correct">Accuracy: 100.0%</h2>
+            `
+            return div;
+        }
+        stats.addTo(map)
+    </script>
+
+    <script>
+        function onClick(e) {
+            var layer = e.target
+            var f_index = e.target.feature.properties.name
+            if (layer.options.fillColor !== 'green') {
+                axios.post('/click', {
+                    input_value: f_index
+                })
+                .then(data => {
+                    if (data.data.color === "green") { 
+                        setColor(layer, 'green', '', 'black')
+                        document.getElementById('location').textContent = data.data.next;
+                        layer.off('mouseout');
+                        layer.off('mouseover');
+                        locked.addLayer(layer)
+                    } else if (data.data.color === "red") {
+                        setColor(layer, 'red', '3', 'black')
+                        layer.off('mouseout');
+                        layer.off('mouseover');
+                        setTimeout(function() {
+                            layer.setStyle({
+                                fillColor: 'blue',
+                            });
+                            layer.on('mouseout', resetHighlight)
+                            layer.on('mouseover', highlightFeature)
+                        }, 1000);
+                    } else {
+                        setColor(layer, 'green', '', 'black')
+                        document.getElementById('location').textContent = "Congratulations, you have found all "+ data.data.total +"!";
+                        layer.off('mouseout');
+                        layer.off('mouseover');
+                        locked.addLayer(layer)
+                    }
+                    document.getElementById('correct').textContent = data.data.percent
+                })
+            }
+            // remove popup after a second
+            setTimeout(function() {
+                map.closePopup();
+            }, 3000)
+        }
+    </script>
+
+    <script>
+        // Load GeoJSON data
+        axios.get(geodata)
+            .then(data => {
+                data = data.data
+                
+                const locations = [];
+                for (let i = 0; i < data.features.length; i++){
+                    locations.push(data.features[i].properties.name)
+                };
+
+                axios.post('/collect', {
+                    locations: locations
+                }).then(loc => {
+                    document.getElementById('location').textContent = loc.data.first
+                });
+
+                L.geoJSON(data, {
+                    style: function (feature) {
+                        return {
+                            fillColor: 'blue', // Color of the regions
+                            fillOpacity: 0.5,
+                            weight: 1,
+                            color: 'black',
+                            dashArray: '3'
+                        };
+                    },
+                    onEachFeature: function (feature, layer) {
+                        layer.bindPopup(feature.properties.name);
+
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight,
+                            click: onClick
+                        })
+                    }
+                }).addTo(map);
+            });
+    </script>
+</body>
+</html>

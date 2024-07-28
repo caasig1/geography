@@ -1,0 +1,14 @@
+Open QGIS
+Load the country I want to add outlines to
+Select it and look for 'Split vector layer' in Processing Toolbox
+    (Processing tab -> Toolbox)
+Run after changing Unique ID field to name and setting a folder you can access somewhere on the PC
+Drag all the generated files into QGIS and remove the country file
+Select each layer you want to outline, press the edit button at the top and draw and save
+For each layer you editted, we need the features to be combined, to see this select all files and right click and select show_feature_count
+    1. Multipart to singleparts (in processing toolbox)
+    2. Collect geometries (in processing toolbox)
+Remove the single layer and the original files (only keep Collected layer)
+
+Select all layers, Vector -> Data Management Tools -> Merge Vector Layers
+Save this to static folder

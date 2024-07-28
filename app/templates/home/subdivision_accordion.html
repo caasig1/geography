@@ -1,0 +1,41 @@
+<div class="accordion accordion-body" id="subdiv">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sub_learn" aria-expanded="false" aria-controls="sub_learn">
+                Learning
+            </button>
+        </h2>
+        <div id="sub_learn" class="accordion-collapse collapse" data-bs-parent="#subdiv">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('combined_na_learner') }}"> North America </a> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="#"> Europe </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sub_click" aria-expanded="false" aria-controls="sub_click">
+                Clicking
+            </button>
+        </h2>
+        <div id="sub_click" class="accordion-collapse collapse" data-bs-parent="#subdiv">
+            {% include 'home/sub_click_continent.html' %}
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sub_type" aria-expanded="false" aria-controls="sub_type">
+                Typing
+            </button>
+        </h2>
+        <div id="sub_type" class="accordion-collapse collapse" data-bs-parent="#subdiv">
+            {% include 'home/sub_type_continent.html' %}
+        </div>
+    </div>
+</div>
