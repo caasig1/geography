@@ -16,7 +16,7 @@
 
     {% include 'home/load_map.html' %}
 
-    <script>
+    <script> // handle enter
         function handleKeyPress(event){
             if (event.keyCode === 13) {
                 event.preventDefault();
@@ -46,12 +46,13 @@
             if(store.length === 0){
                 document.getElementById('total').textContent = "Congratulations! You're done :) You finished in " + document.querySelector('#clock').textContent + " seconds!";
                 done = true;
+                score_keep();
             }
         }
 
     </script>
 
-    <script>
+    <script> // layers for stats and timer
         var stats = L.control({position: 'topleft'});
         stats.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
@@ -100,7 +101,7 @@
         }
     </script>
     
-    <script>
+    <script> // initialize data
         var store = [];
         var count = 0;
         var tot = 0;
@@ -136,5 +137,20 @@
                 })
             });
     </script>
+
+<script> // scorekeeping
+    function score_keep(){
+        let time = document.querySelector('#clock').textContent;
+        let date = new Date();
+        date = date.toLocaleDateString();
+        axios.post('/score', {
+                t: time,
+                d: date,
+                s: tot,
+                type: 'typing',
+                r: geodata
+            })
+    }
+</script>
 </body>
 </html>
