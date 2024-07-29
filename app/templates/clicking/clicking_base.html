@@ -21,7 +21,7 @@
         stats.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
             div.innerHTML = `
-                <button type="button" class="btn btn-outline-info" onclick="start()"> Start </button>
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
             `
             return div;
         }
@@ -141,6 +141,8 @@
                         })
                     }
                 })
+
+                document.getElementById("start").disabled = false
             });
     </script>
 
