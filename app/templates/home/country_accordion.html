@@ -17,6 +17,9 @@
                     <tr> 
                         <td> <a href="{{ url_for('countries_sa_learner') }}"> South America </a> </td>
                     </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_as_learner') }}"> Asia </a> </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -48,6 +51,12 @@
                             document.getElementById('sa_country_typing_score').textContent = getScore("{{ url_for('static', filename='score/countries/clicking/sa') }}")
                         </script> </td>
                     </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_as_clicker') }}"> Asia </a> </td>
+                        <td> <a id="as_country_typing_score"></a> <script>
+                            document.getElementById('as_country_typing_score').textContent = getScore("{{ url_for('static', filename='score/countries/clicking/as') }}")
+                        </script> </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -77,6 +86,12 @@
                         <td> <a href="{{ url_for('countries_sa_typer') }}"> South America </a> </td>
                         <td> <a id="sa_country_typing_score"></a> <script>
                             document.getElementById('sa_country_typing_score').textContent = getScore("{{ url_for('static', filename='score/countries/typing/sa') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('countries_as_typer') }}"> Asia </a> </td>
+                        <td> <a id="as_country_typing_score"></a> <script>
+                            document.getElementById('as_country_typing_score').textContent = getScore("{{ url_for('static', filename='score/countries/typing/as') }}")
                         </script> </td>
                     </tr>
                 </tbody>
