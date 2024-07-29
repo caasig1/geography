@@ -16,7 +16,7 @@
 
     {% include 'home/load_map.html' %}
 
-    <script>
+    <script> // creating layers for stats and a timer
         var stats = L.control({position: 'topleft'});
         stats.onAdd = function(map) {
             var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
@@ -59,7 +59,7 @@
         }
     </script>
 
-    <script>
+    <script> // dealing with a click
         function onClick(e) {
             var layer = e.target
             var f_index = e.target.feature.properties.name
@@ -92,20 +92,20 @@
                         layer.off('mouseout');
                         layer.off('mouseover');
                         locked.addLayer(layer);
+                        document.getElementById('correct').textContent = data.data.percent
+                        score_keep();
                     }
                     document.getElementById('correct').textContent = data.data.percent
                 })
             }
-            // remove popup after a second
             setTimeout(function() {
                 map.closePopup();
             }, 3000)
         }
     </script>
 
-    <script>
+    <script> // initializing data
         var find;
-        // Load GeoJSON data
         axios.get(geodata)
             .then(data => {
                 data = data.data;
@@ -142,6 +142,22 @@
                     }
                 })
             });
+    </script>
+
+    <script> // scorekeeping
+        function score_keep(){
+            let time = document.querySelector('#clock').textContent;
+            let date = new Date();
+            date = date.toLocaleDateString();
+            let score = document.getElementById('correct').textContent;
+            axios.post('/score', {
+                    t: time,
+                    d: date,
+                    s: score.slice(10, -1),
+                    type: 'clicking',
+                    r: geodata
+                })
+        }
     </script>
 </body>
 </html>

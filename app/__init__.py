@@ -8,3 +8,4 @@ from app.loading import load_na_subdivisions, load_countries
 from app.clicking import countries, subdivisions_na
 from app.learning import countries, subdivisions_na
 from app.typing import countries, subdivisions_na
+from app.scorekeeping import score

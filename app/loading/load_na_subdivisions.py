@@ -117,8 +117,8 @@ def trinidad_and_tobago_geojson():
     file = 'static/subdivisions/na/trinidad_and_tobago.geojson'
     return send_file(file)
 
-@app.route('/combined_na.geojson')
-def combined_na():
+@app.route('/subdivision_na.geojson')
+def subdivision_na():
     folder = os.path.join(app.static_folder, 'subdivisions')
     folder = os.path.join(folder, 'na')
     geodata = []
