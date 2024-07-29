@@ -44,7 +44,8 @@
             }
 
             if(store.length === 0){
-                document.getElementById('total').textContent = "Congratulations! You're done :)";
+                document.getElementById('total').textContent = "Congratulations! You're done :) You finished in " + document.querySelector('#clock').textContent + " seconds!";
+                done = true;
             }
         }
 
@@ -53,19 +54,50 @@
     <script>
         var stats = L.control({position: 'topleft'});
         stats.onAdd = function(map) {
-            var div = L.DomUtil.create('div', 'leaflet-control custom-control');
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
             div.innerHTML = `
+                <button type="button" class="btn btn-outline-info" onclick="start()"> Start </button>
+            `
+            return div;
+        }
+        stats.addTo(map)
+
+        function start() {
+            stats._container.innerHTML = `
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="Guess" aria-label="Guess" aria-describedby="submit" id="answer">
                     <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
                 </div>
                 <h2 id="total">Default</h2>
             `
-            return div;
+            document.getElementById('answer').addEventListener('keydown', function(e) {handleKeyPress(e)})
+            document.getElementById('submit').addEventListener('click', function(e) {submit_guess()})
+
+            document.getElementById('answer').value = "";
+            tot = store.length.toString();
+            document.getElementById('total').textContent = count.toString() + ' of ' + tot + ' correct';
+
+            var timer = L.control({position: 'topright'});
+            timer.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+                div.innerHTML = `
+                    <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+                `
+                return div;
+            }
+            timer.addTo(map);
+            updateTimer(new Date());
         }
-        stats.addTo(map)
-        document.getElementById('answer').addEventListener('keydown', function(e) {handleKeyPress(e)})
-        document.getElementById('submit').addEventListener('click', function(e) {submit_guess()})
+
+        var done = false;
+        function updateTimer(current){
+            if (!done){
+                const now = new Date();
+                document.querySelector('#clock').textContent = (now - current)/ 1000
+                setTimeout(function() {
+                    updateTimer(current);
+            }, 10)}
+        }
     </script>
     
     <script>
@@ -102,9 +134,6 @@
                     }
                     store.push(to_add)
                 })
-                document.getElementById('answer').value = "";
-                tot = store.length.toString();
-                document.getElementById('total').textContent = count.toString() + ' of ' + tot + ' correct';
             });
     </script>
 </body>

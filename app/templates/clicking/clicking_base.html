@@ -19,14 +19,44 @@
     <script>
         var stats = L.control({position: 'topleft'});
         stats.onAdd = function(map) {
-            var div = L.DomUtil.create('div', 'leaflet-control custom-control');
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
             div.innerHTML = `
-                <h2 id="location">Default</h2>
-                <h2 id="correct">Accuracy: 100.0%</h2>
+                <button type="button" class="btn btn-outline-info" onclick="start()"> Start </button>
             `
             return div;
         }
         stats.addTo(map)
+
+        function start() {
+            stats._container.innerHTML = `
+                <h2 id="location">Default</h2>
+                <h2 id="correct">Accuracy: 100.0%</h2>
+            `;
+
+            document.getElementById('location').textContent = find;
+            territories.addTo(map)
+
+            var timer = L.control({position: 'topright'});
+            timer.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+                div.innerHTML = `
+                    <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+                `
+                return div;
+            }
+            timer.addTo(map);
+            updateTimer(new Date());
+        }
+
+        var done = false;
+        function updateTimer(current){
+            if (!done){
+                const now = new Date();
+                document.querySelector('#clock').textContent = (now - current)/ 1000
+                setTimeout(function() {
+                    updateTimer(current);
+            }, 10)}
+        }
     </script>
 
     <script>
@@ -57,10 +87,11 @@
                         }, 1000);
                     } else {
                         setColor(layer, 'green', '', 'black')
-                        document.getElementById('location').textContent = "Congratulations, you have found all "+ data.data.total +"!";
+                        document.getElementById('location').textContent = "Congratulations, you have found all "+ data.data.total + " in " + document.querySelector('#clock').textContent + " seconds!";
+                        done = true;
                         layer.off('mouseout');
                         layer.off('mouseover');
-                        locked.addLayer(layer)
+                        locked.addLayer(layer);
                     }
                     document.getElementById('correct').textContent = data.data.percent
                 })
@@ -73,10 +104,11 @@
     </script>
 
     <script>
+        var find;
         // Load GeoJSON data
         axios.get(geodata)
             .then(data => {
-                data = data.data
+                data = data.data;
                 
                 const locations = [];
                 for (let i = 0; i < data.features.length; i++){
@@ -86,10 +118,10 @@
                 axios.post('/collect', {
                     locations: locations
                 }).then(loc => {
-                    document.getElementById('location').textContent = loc.data.first
+                    find = loc.data.first
                 });
 
-                L.geoJSON(data, {
+                territories = L.geoJSON(data, {
                     style: function (feature) {
                         return {
                             fillColor: 'blue', // Color of the regions
@@ -108,7 +140,7 @@
                             click: onClick
                         })
                     }
-                }).addTo(map);
+                })
             });
     </script>
 </body>
