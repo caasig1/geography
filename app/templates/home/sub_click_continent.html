@@ -9,124 +9,194 @@
             <table class="table table-bordered">
                 <tbody>
                     <tr>
-                        <td> 
-                            <a href="{{ url_for('combined_na_clicker') }}"> North America </a> 
-                        </td>
+                        <td> <a href="{{ url_for('combined_na_clicker') }}"> North America </a> </td>
+                        <td> <a id="na_subdivision_clicking_score"></a> <script>
+                            document.getElementById('na_subdivision_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/na') }}")
+                        </script> </td>
                     </tr>
                     <tr>
                         <td> 
                             <a href="{{ url_for('antigua_and_barbuda_clicker') }}"> Antigua and Barbuda </a>
                         </td>
+                        <td> <a id="antigua_and_barbuda_clicking_score"></a> <script>
+                            document.getElementById('antigua_and_barbuda_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/antigua_and_barbuda') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('bahamas_clicker') }}"> Bahamas </a>
                         </td> 
+                        <td> <a id="bahamas_clicking_score"></a> <script>
+                            document.getElementById('bahamas_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/bahamas') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('barbados_clicker') }}"> Barbados </a>
                         </td> 
+                        <td> <a id="barbados_clicking_score"></a> <script>
+                            document.getElementById('barbados_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/barbados') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('belize_clicker') }}"> Belize </a>
                         </td> 
+                        <td> <a id="belize_clicking_score"></a> <script>
+                            document.getElementById('belize_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/belize') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('canada_clicker') }}"> Canada </a> 
                         </td> 
+                        <td> <a id="canada_clicking_score"></a> <script>
+                            document.getElementById('canada_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/canada') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('costa_rica_clicker') }}"> Costa Rica </a>
                         </td> 
+                        <td> <a id="costa_rica_clicking_score"></a> <script>
+                            document.getElementById('costa_rica_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/costa_rica') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('cuba_clicker') }}"> Cuba </a>
                         </td> 
+                        <td> <a id="cuba_clicking_score"></a> <script>
+                            document.getElementById('cuba_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/cuba') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('dominica_clicker') }}"> Dominica </a>
                         </td> 
+                        <td> <a id="dominica_clicking_score"></a> <script>
+                            document.getElementById('dominica_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/dominica') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('dominican_republic_clicker') }}"> Dominican Republic </a>
                         </td> 
+                        <td> <a id="dominican_republic_clicking_score"></a> <script>
+                            document.getElementById('dominican_republic_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/dominican_republic') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('el_salvador_clicker') }}"> El Salvador </a>
                         </td> 
+                        <td> <a id="el_salvador_clicking_score"></a> <script>
+                            document.getElementById('el_salvador_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/el_salvador') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('grenada_clicker') }}"> Grenada </a>
                         </td> 
+                        <td> <a id="grenada_clicking_score"></a> <script>
+                            document.getElementById('grenada_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/grenada') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('guatemala_clicker') }}"> Guatemala </a>
                         </td> 
+                        <td> <a id="guatemala_clicking_score"></a> <script>
+                            document.getElementById('guatemala_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/guatemala') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('haiti_clicker') }}"> Haiti </a>
                         </td> 
+                        <td> <a id="haiti_clicking_score"></a> <script>
+                            document.getElementById('haiti_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/haiti') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('honduras_clicker') }}"> Honduras </a>
                         </td> 
+                        <td> <a id="honduras_clicking_score"></a> <script>
+                            document.getElementById('honduras_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/honduras') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('jamaica_clicker') }}"> Jamaica </a>
                         </td> 
+                        <td> <a id="jamaica_clicking_score"></a> <script>
+                            document.getElementById('jamaica_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/jamaica') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('mexico_clicker') }}"> Mexico </a> 
                         </td> 
+                        <td> <a id="mexico_clicking_score"></a> <script>
+                            document.getElementById('mexico_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/mexico') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('nicaragua_clicker') }}"> Nicaragua </a>
                         </td> 
+                        <td> <a id="nicaragua_clicking_score"></a> <script>
+                            document.getElementById('nicaragua_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/nicaragua') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('panama_clicker') }}"> Panama </a>
                         </td> 
+                        <td> <a id="panama_clicking_score"></a> <script>
+                            document.getElementById('panama_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/panama') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('saint_kitts_and_nevis_clicker') }}"> Saint Kitts and Nevis </a>
                         </td> 
+                        <td> <a id="saint_kitts_and_nevis_clicking_score"></a> <script>
+                            document.getElementById('saint_kitts_and_nevis_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/saint_kitts_and_nevis') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('saint_lucia_clicker') }}"> Saint Lucia </a>
                         </td> 
+                        <td> <a id="saint_lucia_clicking_score"></a> <script>
+                            document.getElementById('saint_lucia_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/saint_lucia') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('saint_vincent_and_the_grenadines_clicker') }}"> Saint Vincent and the Grenadines </a>
                         </td> 
+                        <td> <a id="saint_vincent_and_the_grenadines_clicking_score"></a> <script>
+                            document.getElementById('saint_vincent_and_the_grenadines_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/saint_vincent_and_the_grenadines') }}")
+                        </script> </td>
                     </tr>
                     <tr> 
                         <td> 
                             <a href="{{ url_for('trinidad_and_tobago_clicker') }}"> Trinidad and Tobago </a>
                         </td> 
+                        <td> <a id="trinidad_and_tobago_clicking_score"></a> <script>
+                            document.getElementById('trinidad_and_tobago_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/trinidad_and_tobago') }}")
+                        </script> </td>
                     </tr>
                     <tr>
                         <td> 
                             <a href="{{ url_for('usa_clicker') }}"> USA </a> 
                         </td> 
+                        <td> <a id="usa_clicking_score"></a> <script>
+                            document.getElementById('usa_clicking_score').textContent = getScore("{{ url_for('static', filename='score/subdivision/clicking/usa') }}")
+                        </script> </td>
                     </tr>
                 </tbody>
             </table>

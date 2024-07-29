@@ -6,7 +6,12 @@
         xmlhttp.send();
         if (xmlhttp.status == 200) {
             result = xmlhttp.responseText;
+            temp = result.split('\n').shift();
+            temp = temp.split(",")
+            result = temp[0] + "% in " + temp[1] + " seconds on " + temp
+            return result
+        } else {
+            return "NA"
         }
-        return result
     }
 </script>
