@@ -44,9 +44,12 @@
             }
 
             if(store.length === 0){
+                stats._container.innerHTML = `
+                    <h2 id="total"> Default  </h2>
+                `
                 document.getElementById('total').textContent = "Congratulations! You're done :) You finished in " + document.querySelector('#clock').textContent + " seconds!";
                 done = true;
-                score_keep();
+                score_keep('100.0');
             }
         }
 
@@ -66,7 +69,7 @@
         function start() {
             stats._container.innerHTML = `
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Guess" aria-label="Guess" aria-describedby="submit" id="answer">
+                    <input type="text" class="form-control" placeholder="Guess" aria-label="Guess" aria-describedby="submit" id="answer" autocomplete="off">
                     <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
                 </div>
                 <h2 id="total">Default</h2>
@@ -83,6 +86,7 @@
                 var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
                 div.innerHTML = `
                     <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+                    <button type="button" class="btn btn-outline-info" onclick="give_up()"> Give Up </button>
                 `
                 return div;
             }
@@ -98,6 +102,16 @@
                 setTimeout(function() {
                     updateTimer(current);
             }, 10)}
+        }
+
+        function give_up(){
+            stats._container.innerHTML = `
+                <h2 id="total"> Default  </h2>
+            `
+            let s = Math.round((tot - store.length)*10000 / tot)/100
+            document.getElementById('total').textContent = "You got " + s.toString() + "% correct in " + document.querySelector('#clock').textContent + " seconds. Try again next time :)";
+            done = true;
+            score_keep(s.toString());
         }
     </script>
     
@@ -139,14 +153,14 @@
     </script>
 
 <script> // scorekeeping
-    function score_keep(){
+    function score_keep(score){
         let time = document.querySelector('#clock').textContent;
         let date = new Date();
         date = date.toLocaleDateString();
         axios.post('/score', {
                 t: time,
                 d: date,
-                s: '100.0',
+                s: score,
                 type: 'typing',
                 r: geodata
             })
