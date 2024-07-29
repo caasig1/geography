@@ -12,16 +12,13 @@ def score():
     if len(region) == 1:
         folder = 'subdivision'
         file = region[0]
-    elif len(region) == 2:
+    else:
         if region[0] not in ["countries", "capitals", "subdivision"]:
             folder = 'subdivision'
             file = "_".join(region)
         else:
             folder = region[0]
             file = region[1]
-    else:
-        folder = region[0]
-        file = "_".join(region[1:])
     
     path = os.path.join(app.static_folder, 'score')
     path = os.path.join(path, folder)

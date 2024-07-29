@@ -49,6 +49,7 @@
                 `
                 document.getElementById('total').textContent = "Congratulations! You're done :) You finished in " + document.querySelector('#clock').textContent + " seconds!";
                 done = true;
+                document.getElementById('give_up').disabled=true;
                 score_keep('100.0');
             }
         }
@@ -86,7 +87,7 @@
                 var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
                 div.innerHTML = `
                     <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
-                    <button type="button" class="btn btn-outline-info" onclick="give_up()"> Give Up </button>
+                    <button type="button" class="btn btn-outline-info" id="give_up" onclick="give_up()"> Give Up </button>
                 `
                 return div;
             }
@@ -111,6 +112,7 @@
             let s = Math.round((tot - store.length)*10000 / tot)/100
             document.getElementById('total').textContent = "You got " + s.toString() + "% correct in " + document.querySelector('#clock').textContent + " seconds. Try again next time :)";
             done = true;
+            document.getElementById('give_up').disabled=true;
             score_keep(s.toString());
         }
     </script>
