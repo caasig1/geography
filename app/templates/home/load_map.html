@@ -8,7 +8,7 @@
     var locked = L.layerGroup();
     var world;
 
-    fetch('static/world.geojson').then(response => response.json())
+    fetch('static/trial.geojson').then(response => response.json())
             .then(data => {
                 var geoLayer = L.geoJSON(data, {
                     style: function (feature) {
@@ -26,6 +26,26 @@
                 world = geoLayer;
                 world.bringToFront();
             })
+
+    const dotIcon = L.divIcon({
+        className: 'dot-icon',
+        html: `
+            <svg width="10" height="10" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="5" fill="red" />
+            </svg>`,
+        iconSize: [10, 10],  // Size of the dot
+        iconAnchor: [5, 10], // Point of the icon which will correspond to marker's location
+    });
+
+    fetch("{{ url_for('static', filename='capitals.txt') }}")
+        .then(response => response.text())
+        .then(text => {
+            const coords = text.split(/\r?\n|\r/);
+            for (let i = 0; i < coords.length; i++){
+                const c = coords[i].split(',');
+                L.marker(c, {icon:dotIcon, interactive: false}).addTo(map)
+            }
+        })
 
     // Function to highlight feature on mouseover
     function highlightFeature(e) {
