@@ -20,3 +20,7 @@ def countries_sa_typer():
 @app.route('/countries_as_typer')
 def countries_as_typer():
     return render_template("typing/countries/countries_as_type.html")
+
+@app.route('/countries_af_typer')
+def countries_af_typer():
+    return render_template("typing/countries/countries_af_type.html")

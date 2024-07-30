@@ -12,3 +12,12 @@ Remove the single layer and the original files (only keep Collected layer)
 
 Select all layers, Vector -> Data Management Tools -> Merge Vector Layers
 Save this to static folder
+
+
+Drawing another polygon to merge with a current one (i.e. cyprus or somalia had disputed territories)
+1. create layer > new shapefile -- select polygon
+    - draw out whatever outline you want to combine
+2. vector > data tools > merge vector layers
+3. highlight all features you want to combine (control + a when on the desired layer to highlight everything in that layer)
+4. advanced digitizing toolbar : view > toolbars > advanced digitizing toolbar
+5. begin editting on layer and select merge selected features from bar

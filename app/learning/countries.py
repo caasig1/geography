@@ -19,3 +19,7 @@ def countries_sa_learner():
 @app.route('/countries_as_learner')
 def countries_as_learner():
     return render_template("learning/countries/countries_as.html")
+
+@app.route('/countries_af_learner')
+def countries_af_learner():
+    return render_template("learning/countries/countries_af.html")

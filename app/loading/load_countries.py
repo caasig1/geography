@@ -36,3 +36,7 @@ def countries_sa():
 @app.route('/countries_as.geojson')
 def countries_as():
     return helper('asia')
+
+@app.route('/countries_af.geojson')
+def countries_af():
+    return helper('africa')

@@ -19,3 +19,7 @@ def countries_sa_clicker():
 @app.route('/countries_as_clicker')
 def countries_as_clicker():
     return render_template("clicking/countries/countries_as_click.html")
+
+@app.route('/countries_af_clicker')
+def countries_af_clicker():
+    return render_template("clicking/countries/countries_af_click.html")
