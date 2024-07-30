@@ -24,3 +24,11 @@ def countries_as_typer():
 @app.route('/countries_af_typer')
 def countries_af_typer():
     return render_template("typing/countries/countries_af_type.html")
+
+@app.route('/countries_oc_typer')
+def countries_oc_typer():
+    return render_template("typing/countries/countries_oc_type.html")
+
+@app.route('/countries_typer')
+def countries_typer():
+    return render_template("typing/countries/countries_type.html")

@@ -4,7 +4,7 @@
     var hor = document.querySelector('meta[name="map-init"]').getAttribute('hor');
     var zoom = document.querySelector('meta[name="map-init"]').getAttribute('zoom');
 
-    var map = L.map('map', {zoomControl: false}).setView([vert, hor], zoom); // Set initial coordinates and zoom level
+    var map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([vert, hor], zoom); // Set initial coordinates and zoom level
     var locked = L.layerGroup();
     var world;
 

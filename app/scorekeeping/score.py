@@ -10,8 +10,12 @@ def score():
     type = request.json['type']
     region = request.json['r'][2:-9].split('_')
     if len(region) == 1:
-        folder = 'subdivision'
-        file = region[0]
+        if region[0] == 'countries':
+            folder = region[0]
+            file = region[0]
+        else:
+            folder = 'subdivision'
+            file = region[0]
     else:
         if region[0] not in ["countries", "capitals", "subdivision"]:
             folder = 'subdivision'

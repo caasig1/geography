@@ -40,3 +40,35 @@ def countries_as():
 @app.route('/countries_af.geojson')
 def countries_af():
     return helper('africa')
+
+@app.route('/countries_oc.geojson')
+def countries_oc():
+    return helper('oc')
+
+@app.route('/countries.geojson')
+def countries():
+    geodata = []
+
+    temp = helper('na')
+    geodata.extend(temp['features'])
+
+    temp = helper('sa')
+    geodata.extend(temp['features'])
+
+    temp = helper('europe') # remove turkey cyprus and russia dupes
+    temp['features'].pop(43)
+    temp['features'].pop(35)
+    temp['features'].pop(8)
+    geodata.extend(temp['features'])
+
+    temp = helper('africa')
+    geodata.extend(temp['features'])
+
+    temp = helper('asia')
+    geodata.extend(temp['features'])
+
+    temp = helper('oc')
+    geodata.extend(temp['features'])
+
+    geodata = geojson.FeatureCollection(geodata)
+    return geodata
