@@ -1,57 +1,15 @@
 <script>
-    var geodata = document.querySelector('meta[name="geojson-data"]').getAttribute('content');
     var vert = document.querySelector('meta[name="map-init"]').getAttribute('vert');
     var hor = document.querySelector('meta[name="map-init"]').getAttribute('hor');
     var zoom = document.querySelector('meta[name="map-init"]').getAttribute('zoom');
 
-    var map = L.map('map', {zoomControl: false, preferCanvas: true}).setView([vert, hor], zoom); // Set initial coordinates and zoom level
-    var locked = L.layerGroup();
-    var world;
-
-    fetch('static/trial.geojson').then(response => response.json())
-            .then(data => {
-                var geoLayer = L.geoJSON(data, {
-                    style: function (feature) {
-                        return {
-                            fillColor: 'transparent',
-                            fillOpacity: 0,
-                            weight: 3,
-                            color: 'black',
-                            dashArray: ''
-                        };
-                    },
-                    interactive: false
-                }).addTo(map)
-
-                world = geoLayer;
-                world.bringToFront();
-            })
-
-    const dotIcon = L.divIcon({
-        className: 'dot-icon',
-        html: `
-            <svg width="10" height="10" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="10" cy="10" r="5" fill="red" />
-            </svg>`,
-        iconSize: [10, 10],  // Size of the dot
-        iconAnchor: [5, 10], // Point of the icon which will correspond to marker's location
-    });
-
-    fetch("{{ url_for('static', filename='capitals.txt') }}")
-        .then(response => response.text())
-        .then(text => {
-            const coords = text.split(/\r?\n|\r/);
-            for (let i = 0; i < coords.length; i++){
-                const c = coords[i].split(',');
-                L.marker(c, {icon:dotIcon, interactive: false}).addTo(map)
-            }
-        })
+    var map = L.map('map', {zoomControl: false, preferCanvas: true, attributionControl: false}).setView([vert, hor], zoom); // Set initial coordinates and zoom level
 
     // Function to highlight feature on mouseover
     function highlightFeature(e) {
-            var layer = e.target;
-            setColor(layer, 'yellow', '', 'black')
-        }
+        var layer = e.target;
+        setColor(layer, 'yellow', '', 'black')
+    }
 
         // Function to reset highlight on mouseout
     function resetHighlight(e) {
@@ -66,15 +24,5 @@
             color: l,
             dashArray: d
         });
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-            if(locked._layers){
-                locked.eachLayer(function (layer) {
-                    layer.bringToFront();
-                });
-            }
-            world.bringToFront();
-        }
     }
 </script>

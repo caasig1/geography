@@ -2,7 +2,9 @@
 <html lang="en">
     <head>
         {% include 'head.html' %}
-        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta id="geodata" data="{% block geojson_data %} Default {% endblock %}">
+        <meta name="continent" content="{% block continent %}NONE{% endblock %}">
+        <meta id="score_path" path="{% block score_path %} Default {% endblock %}">
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <title>{% block title %} Geography Game {% endblock %}</title>
@@ -34,7 +36,15 @@
             `;
 
             document.getElementById('location').textContent = find;
-            territories.addTo(map)
+
+            territories.eachLayer(layer => {
+                layer.eachLayer(entry => {
+                    entry.on('click', function(e) {onClick(e)});
+                    entry.on('mouseover', function(e) {highlightFeature(e)});
+                    entry.on('mouseout', function(e) {resetHighlight(e)});
+                    entry.bindPopup(entry.feature.properties.name);
+                })
+            });
 
             var timer = L.control({position: 'topright'});
             timer.onAdd = function(map) {
@@ -61,8 +71,8 @@
 
     <script> // dealing with a click
         function onClick(e) {
-            var layer = e.target
-            var f_index = e.target.feature.properties.name
+            var layer = e.target;
+            var f_index = layer.feature.properties.name
             if (layer.options.fillColor !== 'green') {
                 axios.post('/click', {
                     input_value: f_index
@@ -73,7 +83,7 @@
                         document.getElementById('location').textContent = data.data.next;
                         layer.off('mouseout');
                         layer.off('mouseover');
-                        locked.addLayer(layer)
+                        layer.off('click');
                     } else if (data.data.color === "red") {
                         setColor(layer, 'red', '3', 'black')
                         layer.off('mouseout');
@@ -91,7 +101,6 @@
                         done = true;
                         layer.off('mouseout');
                         layer.off('mouseover');
-                        locked.addLayer(layer);
                         document.getElementById('correct').textContent = data.data.percent
                         score_keep();
                     }
@@ -105,14 +114,74 @@
     </script>
 
     <script> // initializing data
+        var continent = document.querySelector('meta[name="continent"]').getAttribute('content');
         var find;
-        axios.get(geodata)
+        var territories = L.layerGroup()
+        var geodata = document.getElementById('geodata').getAttribute('data')
+        var locations = [];
+
+        if (continent === "NONE") {
+            // subdivision
+            axios.get(geodata)
+                .then(data => {
+                    data = data.data;
+
+                    for (let i = 0; i < data.features.length; i++){
+                        let subd = data.features[i]
+                        
+                        locations.push(data.features[i].properties.name)
+                        
+                        let temp = L.geoJSON(subd, {
+                            style: function (feature) {
+                                return {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 1,
+                                    color: 'black',
+                                    dashArray: '3'
+                                };
+                            }
+                        })
+                        temp.addTo(territories)
+                        temp.addTo(map)
+                    };
+                })
+        }
+
+        axios.get('/countries.geojson')
             .then(data => {
                 data = data.data;
-                
-                const locations = [];
                 for (let i = 0; i < data.features.length; i++){
-                    locations.push(data.features[i].properties.name)
+                    let country = data.features[i]
+                    
+                    if (country.properties.continent === continent || continent === "ALL") {
+                        locations.push(data.features[i].properties.name)
+                        
+                        let temp = L.geoJSON(country, {
+                            style: function (feature) {
+                                return {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 1,
+                                    color: 'black',
+                                    dashArray: '3'
+                                };
+                            }
+                        })
+                        temp.addTo(territories)
+                        temp.addTo(map)
+                    } else {
+                        L.geoJSON(country, {
+                            style: function (feature) {
+                                return {
+                                    fillOpacity: 0,
+                                    weight: 3,
+                                    color: 'black',
+                                    dashArray: ''
+                                };
+                            }
+                        }).addTo(map)
+                    }
                 };
 
                 axios.post('/collect', {
@@ -121,33 +190,14 @@
                     find = loc.data.first
                 });
 
-                territories = L.geoJSON(data, {
-                    style: function (feature) {
-                        return {
-                            fillColor: 'blue', // Color of the regions
-                            fillOpacity: 0.5,
-                            weight: 1,
-                            color: 'black',
-                            dashArray: '3'
-                        };
-                    },
-                    onEachFeature: function (feature, layer) {
-                        layer.bindPopup(feature.properties.name);
-
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight,
-                            click: onClick
-                        })
-                    }
-                })
-
+                territories.eachLayer(layer => { layer.bringToFront(); })
                 document.getElementById("start").disabled = false
             });
     </script>
 
     <script> // scorekeeping
         function score_keep(){
+            let score_path = document.querySelector('#score_path').getAttribute('path')
             let time = document.querySelector('#clock').textContent;
             let date = new Date();
             date = date.toLocaleDateString();
@@ -157,7 +207,7 @@
                     d: date,
                     s: score.slice(10, -1),
                     type: 'clicking',
-                    r: geodata
+                    score: score_path
                 })
         }
     </script>

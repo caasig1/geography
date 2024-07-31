@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         {% include 'head.html' %}
-        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta id="geojson" content="{% block geojson_data %} Default {% endblock %}">
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <title>{% block title %} Geography Game {% endblock %}</title>
@@ -14,6 +14,7 @@
 
     {% include 'home/load_map.html' %}
     <script>
+        var geodata = document.getElementById('geojson').getAttribute('content')
         // Load GeoJSON data
         axios.get(geodata)
             .then(data => {

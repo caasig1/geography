@@ -2,7 +2,9 @@
 <html lang="en">
     <head>
         {% include 'head.html' %}
-        <meta name="geojson-data" content="{% block geojson_data %} Default {% endblock %}">
+        <meta id="geodata" data="{% block geojson_data %} Default {% endblock %}">
+        <meta name="continent" content="{% block continent %}NONE{% endblock %}">
+        <meta id="score_path" path="{% block score_path %} Default {% endblock %}">
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <title>{% block title %} Geography Game {% endblock %}</title>
@@ -116,47 +118,102 @@
             score_keep(s.toString());
         }
     </script>
-    
-    <script> // initialize data
+
+    <script> // initializing data
+        var continent = document.querySelector('meta[name="continent"]').getAttribute('content');
         var store = [];
         var count = 0;
         var tot = 0;
+        var geodata = document.getElementById('geodata').getAttribute('data')
 
-        // Load GeoJSON data
-        axios.get(geodata)
-            .then(data => {
-                data = data.data
+        if (continent === "NONE") {
+            // subdivision
+            axios.get(geodata)
+                .then(data => {
+                    data = data.data;
 
-                // function takes data which is the geojsondata and makes a layer for it
-                // second param is the options, in this case, it is its style and onEachFeature
-                var focus = L.geoJSON(data, {
-                    style: function (feature) {
-                        return {
-                            fillColor: 'blue', // Color of the regions
-                            fillOpacity: 0.5,
-                            weight: 1,
-                            color: 'black',
-                            dashArray: '3'
-                        };
-                    }
-                }).addTo(map);
-
-                focus.eachLayer(function(layer) {
-                    var to_add = {};
-                    to_add.layer = layer
-                    if ('accepted' in layer.feature.properties){
-                        to_add.accepted = layer.feature.properties.accepted
-                    } else {
-                        to_add.accepted = [layer.feature.properties.name]
-                    }
-                    store.push(to_add)
+                    for (let i = 0; i < data.features.length; i++){
+                        let subd = data.features[i]
+                        
+                        let temp = L.geoJSON(subd, {
+                            style: function (feature) {
+                                return {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 1,
+                                    color: 'black',
+                                    dashArray: '3'
+                                };
+                            }
+                        }).addTo(map)
+                        
+                        temp.eachLayer(layer => {
+                            let to_add = {};
+                            to_add.layer = layer
+                            if ('accepted' in layer.feature.properties){
+                                to_add.accepted = layer.feature.properties.accepted
+                            } else {
+                                to_add.accepted = [layer.feature.properties.name]
+                            }
+                            store.push(to_add)
+                        })
+                    };
                 })
+        }
+
+        axios.get('/countries.geojson')
+            .then(data => {
+                data = data.data;
+                
+                for (let i = 0; i < data.features.length; i++){
+                    let country = data.features[i]
+                    
+                    // console.log(country.properties.continent, continent);
+                    if (country.properties.continent === continent || continent === "ALL") {
+                        let temp = L.geoJSON(country, {
+                            style: function (feature) {
+                                return {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 1,
+                                    color: 'black',
+                                    dashArray: '3'
+                                };
+                            }
+                        }).addTo(map)
+                        
+                        temp.eachLayer(layer => {
+                            let to_add = {};
+                            to_add.layer = layer
+                            if ('accepted' in layer.feature.properties){
+                                to_add.accepted = layer.feature.properties.accepted
+                            } else {
+                                to_add.accepted = [layer.feature.properties.name]
+                            }
+                            store.push(to_add)
+                        })
+
+                    } else {
+                        L.geoJSON(country, {
+                            style: function (feature) {
+                                return {
+                                    fillOpacity: 0,
+                                    weight: 3,
+                                    color: 'black',
+                                    dashArray: ''
+                                };
+                            }
+                        }).addTo(map)
+                    }
+                };
+                
                 document.getElementById("start").disabled = false
-            })
+            });
     </script>
 
 <script> // scorekeeping
     function score_keep(score){
+        let score_path = document.querySelector('#score_path').getAttribute('path')
         let time = document.querySelector('#clock').textContent;
         let date = new Date();
         date = date.toLocaleDateString();
@@ -165,7 +222,7 @@
                 d: date,
                 s: score,
                 type: 'typing',
-                r: geodata
+                score: score_path
             })
     }
 </script>

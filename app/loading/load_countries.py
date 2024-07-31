@@ -13,37 +13,12 @@ def helper(continent):
             with open(fp, 'r') as f:
                 data = geojson.load(f)
             
-            if data['type'] == 'FeatureCollection':
-                geodata.extend(data['features'])
-            elif data['type'] == 'Feature':
-                geodata.append(data)
+            for feature in data['features']:
+                if feature['geometry']['type'] in ['MultiPolygon','Polygon']:
+                    geodata.append(feature)
 
     geodata = geojson.FeatureCollection(geodata)
     return geodata
-
-@app.route('/countries_na.geojson')
-def countries_na():
-    return helper('na')
-
-@app.route('/countries_eu.geojson')
-def countries_eu():
-    return helper('europe')
-
-@app.route('/countries_sa.geojson')
-def countries_sa():
-    return helper('sa')
-
-@app.route('/countries_as.geojson')
-def countries_as():
-    return helper('asia')
-
-@app.route('/countries_af.geojson')
-def countries_af():
-    return helper('africa')
-
-@app.route('/countries_oc.geojson')
-def countries_oc():
-    return helper('oc')
 
 @app.route('/countries.geojson')
 def countries():
