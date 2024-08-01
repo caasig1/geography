@@ -693,7 +693,8 @@
         "coordinates": [18.5944, -72.3074]
       },
       "properties": {
-        "name": "Port-au-Prince"
+        "name": "Port-au-Prince",
+        "accepted": ["Port au Prince", "Port-au-Prince"]
       }
     }
   ]

@@ -281,7 +281,8 @@
         "coordinates": [29.3759, 47.9774]
       },
       "properties": {
-        "name": "Kuwait City"
+        "name": "Kuwait City",
+        "accepted": ["Kuwait", "Kuwait City"]
       }
     }
   ]

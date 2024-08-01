@@ -860,7 +860,8 @@
         "coordinates": [-21.1333, -175.2000]
       },
       "properties": {
-        "name": "Nuku'alofa"
+        "name": "Nuku'alofa",
+        "accepted": ["Nukualofa", "Nuku'alofa"]
       }
     }
   ]

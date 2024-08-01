@@ -2692,7 +2692,8 @@
         "coordinates": [50.4501, 30.5234]
       },
       "properties": {
-        "name": "Kyiv"
+        "name": "Kyiv",
+        "accepted": ["Kiev", "Kyiv"]
       }
     }
   ]

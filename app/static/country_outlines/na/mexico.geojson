@@ -7644,7 +7644,8 @@
         "coordinates": [19.4326, -99.1332]
       },
       "properties": {
-        "name": "Mexico City"
+        "name": "Mexico City",
+        "accepted": ["Mexico", "Mexico City"]
       }
     }
   ]

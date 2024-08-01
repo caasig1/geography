@@ -1513,7 +1513,8 @@
         "coordinates": [47.8860, 106.9057]
       },
       "properties": {
-        "name": "Ulaanbaatar"
+        "name": "Ulaanbaatar",
+        "accepted": ["Ulaanbaatar", "Ulan Bator"]
       }
     }
   ]

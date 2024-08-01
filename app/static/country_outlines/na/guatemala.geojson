@@ -482,7 +482,8 @@
         "coordinates": [14.6349, -90.5069]
       },
       "properties": {
-        "name": "Guatemala City"
+        "name": "Guatemala City",
+        "accepted": ["Guatemala", "Guatemala City"]
       }
     }
   ]

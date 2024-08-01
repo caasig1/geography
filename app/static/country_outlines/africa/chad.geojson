@@ -1235,7 +1235,8 @@
         "coordinates": [12.6392, 14.0180]
       },
       "properties": {
-        "name": "N'Djamena"
+        "name": "N'Djamena",
+        "accepted": ["NDjamena", "N'Djamena"]
       }
     }
   ]

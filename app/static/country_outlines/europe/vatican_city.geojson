@@ -410,7 +410,8 @@
         "coordinates": [41.9029, 12.4534]
       },
       "properties": {
-        "name": "Vatican City"
+        "name": "Vatican City",
+        "accepted": ["Vatican", "Vatican City"]
       }
     }
   ]

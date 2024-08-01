@@ -93,7 +93,8 @@
         "coordinates": [12.0561, -61.7488]
       },
       "properties": {
-        "name": "St. George's"
+        "name": "St. George's",
+        "accepted": ["St Georges", "St George"]
       }
     }
   ]

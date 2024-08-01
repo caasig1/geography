@@ -635,7 +635,8 @@
         "coordinates": [6.4969, 2.6288]
       },
       "properties": {
-        "name": "Porto-Novo"
+        "name": "Porto-Novo",
+        "accepted": ["Porto Novo", "Porto-Novo"]
       }
     }
   ]

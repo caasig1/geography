@@ -37429,7 +37429,8 @@
         "coordinates": [38.8951, -77.0369]
       },
       "properties": {
-        "name": "Washington, D.C."
+        "name": "Washington D.C.",
+        "accepted":["Washington", "Washington DC"]
       }
     }
   ]

@@ -1082,7 +1082,8 @@
         "coordinates": [15.3694, 44.1910]
       },
       "properties": {
-        "name": "Sana'a"
+        "name": "Sana'a",
+        "accepted": ["Sana", "Sanaa"]
       }
     }
   ]
