@@ -216,7 +216,8 @@
         "coordinates": [49.6117, 6.13]
       },
       "properties": {
-        "name": "Luxembourg City"
+        "name": "Luxembourg City",
+        "accepted": ["Luxembourg", "Luxembourg City"]
       }
     }
   ]

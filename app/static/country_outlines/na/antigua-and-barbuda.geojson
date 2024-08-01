@@ -137,7 +137,8 @@
         "coordinates": [17.1274, -61.8468]
       },
       "properties": {
-        "name": "St. John's"
+        "name": "St. John's",
+        "accepted": ["St Johns", "St. Johns", "St John's", "St. John's"]
       }
     }
   ]

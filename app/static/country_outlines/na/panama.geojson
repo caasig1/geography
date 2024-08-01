@@ -2080,7 +2080,8 @@
         "coordinates": [8.9824, -79.5190]
       },
       "properties": {
-        "name": "Panama City"
+        "name": "Panama City",
+        "accepted": ["Panama", "Panama City"]
       }
     }
   ]

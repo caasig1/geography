@@ -2235,7 +2235,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [-25.7461, 28.1881]
+        "coordinates": [-25.7529912788284, 28.20137053157713]
       },
       "properties": {
         "name": "Pretoria"
