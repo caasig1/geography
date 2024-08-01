@@ -1,0 +1,128 @@
+<div class="accordion accordion-body" id="capital">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#capital_learning" aria-expanded="false" aria-controls="capital_learning">
+                Learning
+            </button>
+        </h2>
+        <div id="capital_learning" class="accordion-collapse collapse" data-bs-parent="#capital">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_learner') }}"> World </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#capital_clicking" aria-expanded="false" aria-controls="capital_clicking">
+                Clicking
+            </button>
+        </h2>
+        <div id="capital_clicking" class="accordion-collapse collapse" data-bs-parent="#capital">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_na_clicker') }}"> North America </a> </td>
+                        <td> <a id="na_capital_clicking_score"></a> <script>
+                            document.getElementById('na_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/na') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_eu_clicker') }}"> Europe </a> </td>
+                        <td> <a id="eu_capital_clicking_score"></a> <script>
+                            document.getElementById('eu_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/eu') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_sa_clicker') }}"> South America </a> </td>
+                        <td> <a id="sa_capital_clicking_score"></a> <script>
+                            document.getElementById('sa_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/sa') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_as_clicker') }}"> Asia </a> </td>
+                        <td> <a id="as_capital_clicking_score"></a> <script>
+                            document.getElementById('as_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/as') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_af_clicker') }}"> Africa </a> </td>
+                        <td> <a id="af_capital_clicking_score"></a> <script>
+                            document.getElementById('af_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/af') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_oc_clicker') }}"> Oceania </a> </td>
+                        <td> <a id="oc_capital_clicking_score"></a> <script>
+                            document.getElementById('oc_capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/oc') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_clicker') }}"> World </a> </td>
+                        <td> <a id="capital_clicking_score"></a> <script>
+                            document.getElementById('capital_clicking_score').textContent = getScore("{{ url_for('static', filename='score/capitals/clicking/capitals') }}")
+                        </script> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#capital_typing" aria-expanded="false" aria-controls="capital_typing">
+                Typing
+            </button>
+        </h2>
+        <div id="capital_typing" class="accordion-collapse collapse" data-bs-parent="#capital">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_na_typer') }}"> North America </a></td>
+                        <td> <a id="na_capital_typing_score"></a> <script>
+                            document.getElementById('na_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/na') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_eu_typer') }}"> Europe </a> </td>
+                        <td> <a id="eu_capital_typing_score"></a> <script>
+                            document.getElementById('eu_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/eu') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_sa_typer') }}"> South America </a> </td>
+                        <td> <a id="sa_capital_typing_score"></a> <script>
+                            document.getElementById('sa_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/sa') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_as_typer') }}"> Asia </a> </td>
+                        <td> <a id="as_capital_typing_score"></a> <script>
+                            document.getElementById('as_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/as') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_af_typer') }}"> Africa </a> </td>
+                        <td> <a id="af_capital_typing_score"></a> <script>
+                            document.getElementById('af_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/af') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_oc_typer') }}"> Oceania </a> </td>
+                        <td> <a id="oc_capital_typing_score"></a> <script>
+                            document.getElementById('oc_capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/oc') }}")
+                        </script> </td>
+                    </tr>
+                    <tr> 
+                        <td> <a href="{{ url_for('capitals_typer') }}"> World </a> </td>
+                        <td> <a id="capital_typing_score"></a> <script>
+                            document.getElementById('capital_typing_score').textContent = getScore("{{ url_for('static', filename='score/capitals/typing/capitals') }}")
+                        </script> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

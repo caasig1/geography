@@ -1,7 +1,10 @@
 {
   "type": "FeatureCollection",
+  "name": "canada",
   "features": [
     {
+      "type": "Feature",
+      "properties": { "name": "Canada", "continent": "NA" },
       "geometry": {
         "type": "MultiPolygon",
         "coordinates": [
@@ -69802,22 +69805,12 @@
             ]
           ]
         ]
-      },
-      "type": "Feature",
-      "properties": {
-        "name": "Canada",
-        "continent": "NA"
       }
     },
     {
       "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [45.4215, -75.6972]
-      },
-      "properties": {
-        "name": "Ottawa"
-      }
+      "properties": { "name": "Ottawa" },
+      "geometry": { "type": "Point", "coordinates": [45.4215, -75.6972] }
     }
   ]
 }

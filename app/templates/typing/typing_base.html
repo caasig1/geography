@@ -3,8 +3,13 @@
     <head>
         {% include 'head.html' %}
         <meta id="geodata" data="{% block geojson_data %} Default {% endblock %}">
+        <!-- this is only used for subdivisions (map is always drawn with all countries but subdivisions need more data) -->
         <meta name="continent" content="{% block continent %}NONE{% endblock %}">
+        <!-- continent is either NONE (for subdivisions), a continent ie NA or EU, or ALL (for world) -->
         <meta id="score_path" path="{% block score_path %} Default {% endblock %}">
+        <!-- path to the right file for score keeping purposes -->
+        <meta id="type" content="{% block type %}country{% endblock %}">
+        <!-- whether it is country or capital (not used for subdivisions) (not used for countries due to it auto being country) -->
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <title>{% block title %} Geography Game {% endblock %}</title>
@@ -47,7 +52,7 @@
 
             if(store.length === 0){
                 stats._container.innerHTML = `
-                    <h2 id="total"> Default  </h2>
+                    <h2 id="total"> Default  </h2> <a id="answer"></a>
                 `
                 document.getElementById('total').textContent = "Congratulations! You're done :) You finished in " + document.querySelector('#clock').textContent + " seconds!";
                 done = true;
@@ -125,6 +130,7 @@
         var count = 0;
         var tot = 0;
         var geodata = document.getElementById('geodata').getAttribute('data')
+        var quiz_type = document.getElementById('type').getAttribute('content')
 
         if (continent === "NONE") {
             // subdivision
@@ -161,14 +167,21 @@
                 })
         }
 
+        var capitalMarker = {
+            radius: 5,
+            fillColor: "red",
+            weight: 0,
+            fillOpacity: 1
+        };
+
         axios.get('/countries.geojson')
             .then(data => {
                 data = data.data;
                 
-                for (let i = 0; i < data.features.length; i++){
-                    let country = data.features[i]
+                for (let i = 0; i < data[0].features.length; i++){
+                    let country = data[0].features[i]
+                    let capital = data[1].features[i]
                     
-                    // console.log(country.properties.continent, continent);
                     if (country.properties.continent === continent || continent === "ALL") {
                         let temp = L.geoJSON(country, {
                             style: function (feature) {
@@ -185,14 +198,29 @@
                         temp.eachLayer(layer => {
                             let to_add = {};
                             to_add.layer = layer
-                            if ('accepted' in layer.feature.properties){
-                                to_add.accepted = layer.feature.properties.accepted
+                            if (quiz_type == 'country') {
+                                if ('accepted' in layer.feature.properties){
+                                    to_add.accepted = layer.feature.properties.accepted
+                                } else {
+                                    to_add.accepted = [layer.feature.properties.name]
+                                }
+                                store.push(to_add)
                             } else {
-                                to_add.accepted = [layer.feature.properties.name]
+                                if ('accepted' in capital.properties){
+                                    to_add.accepted = capital.properties.accepted
+                                } else {
+                                    to_add.accepted = [capital.properties.name]
+                                }
+                                store.push(to_add)
                             }
-                            store.push(to_add)
                         })
 
+                        L.geoJSON(capital, {
+                            pointToLayer: function(feature, coords) {
+                                let c = L.latLng(coords.lng, coords.lat)
+                                return L.circleMarker(c, capitalMarker);
+                            }
+                        }).addTo(map)
                     } else {
                         L.geoJSON(country, {
                             style: function (feature) {

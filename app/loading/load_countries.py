@@ -5,7 +5,8 @@ import json, geojson, random, os
 def helper(continent):
     folder = os.path.join(app.static_folder, 'country_outlines')
     folder = os.path.join(folder, continent)
-    geodata = []
+    countries = []
+    capitals = []
 
     for filename in os.listdir(folder):
         fp = os.path.join(folder, filename)
@@ -15,35 +16,47 @@ def helper(continent):
             
             for feature in data['features']:
                 if feature['geometry']['type'] in ['MultiPolygon','Polygon']:
-                    geodata.append(feature)
+                    countries.append(feature)
+                elif feature['geometry']['type'] == 'Point':
+                    capitals.append(feature)
 
-    geodata = geojson.FeatureCollection(geodata)
-    return geodata
+    return [countries, capitals]
 
 @app.route('/countries.geojson')
 def countries():
-    geodata = []
+    countries = []
+    capitals = []
 
     temp = helper('na')
-    geodata.extend(temp['features'])
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
     temp = helper('sa')
-    geodata.extend(temp['features'])
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
     temp = helper('europe') # remove turkey cyprus and russia dupes
-    temp['features'].pop(43)
-    temp['features'].pop(35)
-    temp['features'].pop(8)
-    geodata.extend(temp['features'])
+    temp[0].pop(43)
+    temp[0].pop(35)
+    temp[0].pop(8)
+    temp[1].pop(43)
+    temp[1].pop(35)
+    temp[1].pop(8)
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
     temp = helper('africa')
-    geodata.extend(temp['features'])
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
     temp = helper('asia')
-    geodata.extend(temp['features'])
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
     temp = helper('oc')
-    geodata.extend(temp['features'])
+    countries.extend(temp[0])
+    capitals.extend(temp[1])
 
-    geodata = geojson.FeatureCollection(geodata)
-    return geodata
+    countries = geojson.FeatureCollection(countries)
+    capitals = geojson.FeatureCollection(capitals)
+    return [countries, capitals]

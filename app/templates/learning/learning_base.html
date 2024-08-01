@@ -2,45 +2,115 @@
 <html lang="en">
     <head>
         {% include 'head.html' %}
-        <meta id="geojson" content="{% block geojson_data %} Default {% endblock %}">
+        <meta id="geodata" data="{% block geojson_data %} Default {% endblock %}">
+        <!-- this is only used for subdivisions (map is always drawn with all countries but subdivisions need more data) -->
+        <meta name="continent" content="{% block continent %}NONE{% endblock %}">
+        <!-- continent is either NONE (for subdivisions), a continent ie NA or EU, or ALL (for world) -->
+        <meta id="type" content="{% block type %}country{% endblock %}">
+        <!-- whether it is country or capital (not used for subdivisions) (not used for countries due to it auto being country) -->
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <title>{% block title %} Geography Game {% endblock %}</title>
     </head>
 <body>
     {% include 'nav_bar.html' %}
+
     <h1>{% block quiz %} Default Title {% endblock %}</h1>
+
     <div id="map"></div>
 
     {% include 'home/load_map.html' %}
-    <script>
-        var geodata = document.getElementById('geojson').getAttribute('content')
-        // Load GeoJSON data
-        axios.get(geodata)
-            .then(data => {
-                data = data.data
-                // function takes data which is the geojsondata and makes a layer for it
-                // second param is the options, in this case, it is its style and onEachFeature
-                L.geoJSON(data, {
-                    style: function (feature) {
-                        return {
-                            fillColor: 'blue', // Color of the regions
-                            fillOpacity: 0.5,
-                            weight: 1,
-                            color: 'black',
-                            dashArray: '3'
-                        };
-                    },
-                    onEachFeature: function (feature, layer) {
-                        layer.bindPopup(feature.properties.name);
 
-                        layer.on({
-                            mouseover: highlightFeature,
-                            mouseout: resetHighlight
-                        })
+    <script> // initializing data
+        var continent = document.querySelector('meta[name="continent"]').getAttribute('content');
+        var geodata = document.getElementById('geodata').getAttribute('data');
+        var quiz_type = document.getElementById('type').getAttribute('content');
+
+        var capitalMarker = {
+            radius: 5,
+            fillColor: "red",
+            weight: 0,
+            fillOpacity: 1
+        };
+
+        var countryFill;
+        var show;
+        if (continent === "NONE") {
+            show = false;
+            countryFill = {
+                fillOpacity: 0,
+                weight: 3,
+                color: 'black',
+                dashArray: '',
+                interactive: false
+            }
+        } else {
+            show = true;
+            countryFill = {
+                fillColor: 'blue',
+                fillOpacity: 0.5,
+                weight: 1,
+                color: 'black',
+                dashArray: '3',
+                interactive: true
+            }
+        }
+
+        axios.get('/countries.geojson')
+            .then(data => {
+                data = data.data;
+
+                for (let i = 0; i < data[0].features.length; i++){
+                    let country = data[0].features[i]
+                    let capital = data[1].features[i]
+                    
+                    let name;
+                    if (quiz_type === 'country'){
+                        name = data[0].features[i].properties.name;
+                    } else {
+                        name = data[1].features[i].properties.name;
                     }
-                }).addTo(map);
+                    
+                    let temp = L.geoJSON(country, countryFill);
+                    if (show){
+                        temp.bindPopup("Country: " + country.properties.name + "<br>Capital: " + capital.properties.name);
+                    }
+                    temp.addTo(map)
+
+                    L.geoJSON(capital, {
+                        pointToLayer: function(feature, coords) {
+                            let c = L.latLng(coords.lng, coords.lat)
+                            return L.circleMarker(c, capitalMarker);
+                        }
+                    }).addTo(map)
+                };
             });
+
+            if (continent === "NONE") {
+            // subdivision
+            axios.get(geodata)
+                .then(data => {
+                    data = data.data;
+
+                    for (let i = 0; i < data.features.length; i++){
+                        let subd = data.features[i]
+                        
+                        let temp = L.geoJSON(subd, {
+                            style: function (feature) {
+                                return {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 1,
+                                    color: 'black',
+                                    dashArray: '3'
+                                };
+                            }
+                        });
+                        temp.bindPopup(subd.properties.name);
+                        temp.addTo(map);
+                    };
+                })
+        }
     </script>
 </body>
 </html>
