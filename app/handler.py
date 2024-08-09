@@ -1,5 +1,6 @@
 from flask import Flask, render_template, send_file, request, jsonify, session
 from app import app 
+import os
 import json
 import random
 
@@ -41,3 +42,9 @@ def click():
                         'percent' : p,
                         'total' : session['correct_clicks']
                     })
+
+@app.route('/neighbours')
+def get_neighbours():
+    fp = os.path.join(app.static_folder, 'country_info/land_borders.json')
+    with open(fp, 'r') as file:
+        return json.load(file)
