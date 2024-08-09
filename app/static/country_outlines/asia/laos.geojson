@@ -1772,7 +1772,7 @@
       },
       "type": "Feature",
       "properties": {
-        "name": "Lao PDR",
+        "name": "Laos",
         "accepted": ["Laos", "Lao", "Lao PDR"],
         "continent": "AS"
       }
