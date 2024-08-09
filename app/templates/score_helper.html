@@ -16,4 +16,22 @@
             }
         }
     }
+
+    function getProxScore(path){
+        var result;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", path, false);
+        xmlhttp.send();
+        if (xmlhttp.status == 200) {
+            result = xmlhttp.responseText;
+            if (result) {
+                temp = result.split('\n').shift();
+                temp = temp.split(",")
+                result = temp[0] + " found in " + temp[1] + " guess in " + temp[2] + " seconds on " + temp[3]
+                return result
+            } else {
+                return "NA"
+            }
+        }
+    }
 </script>
