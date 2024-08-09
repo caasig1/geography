@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Countries by Neighbours</title>
+
+    {% include 'head.html' %}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <h1> Countries by Neighbours </h1>
+
+    <div id="map"></div>
+
+    <script> // global variables
+        var map = L.map('map', {zoomControl: false, preferCanvas: true, attributionControl: false}).setView([30, 0], 3);
+        var storage = new Map();
+        var done = false;
+        var total = 0;
+        var revealed = 0;
+        var guesses = 0;
+    </script>
+
+    <script> // create stats div in top left
+        var stats = L.control({position: 'topleft'});
+        stats.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            div.innerHTML = `
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
+            `
+            return div;
+        }
+        stats.addTo(map)
+    </script>
+
+    <script> // create timer in top right
+        var timer = L.control({position: 'topright'});
+        timer.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            div.innerHTML = `
+                <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+                <button type="button" class="btn btn-outline-info" id="give_up" onclick="give_up()"> Give Up </button>
+            `
+            return div;
+        }
+
+        function updateTimer(current){
+            if (!done){
+                const now = new Date();
+                document.querySelector('#clock').textContent = (now - current)/ 1000
+                setTimeout(function() {
+                    updateTimer(current);
+            }, 10)}
+        }
+    </script>
+
+    <script> // start button
+        function start() {
+            stats._container.innerHTML = `
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Type a country here" aria-label="Guess" aria-describedby="submit" id="input" autocomplete="off">
+                    <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
+                </div>
+                <h2 id="total">Default</h2>
+            `
+            document.getElementById('input').addEventListener('keydown', function(e) {handleKeyPress(e)});
+            document.getElementById('submit').addEventListener('click', function(e) {submit_guess()});
+            document.getElementById('total').textContent = revealed + " of " + total + " found in " + guesses + " guesses";
+
+            timer.addTo(map);
+            updateTimer(new Date());
+        }
+    </script>
+
+    <script> // give up button
+        function give_up(){
+            end_game();
+        }
+    </script>
+
+    <script> // handle enter
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) {
+                submit_guess();
+            }
+        }
+
+        function submit_guess() {
+            const inputField = document.getElementById('input');
+            
+            const guess = inputField.value.toLowerCase();
+            if (storage.has(guess)){
+                let curr_layer = storage.get(guess)[0]
+                if (!map.hasLayer(curr_layer)){
+                    curr_layer.addTo(map);
+                    revealed += 1
+                }
+                
+                storage.get(guess)[1].forEach(element => {
+                    curr_layer = storage.get(element.toLowerCase())[0];
+                    if (!map.hasLayer(curr_layer)){
+                        curr_layer.addTo(map);
+                        revealed += 1
+                    }
+                });
+                guesses += 1;
+                update_score();
+            }
+            inputField.value = ""
+        }
+
+        function update_score() {
+            document.getElementById('total').textContent = revealed + " of " + total + " found in " + guesses + " guesses";
+            if (revealed === total){
+                end_game();
+            }
+        }
+    </script>
+
+    <script> // end the game
+        function end_game() {
+            done = true;
+            stats._container.innerHTML = `
+                <h2 id="total"> Default  </h2>
+            `
+            const time = document.querySelector('#clock').textContent;
+            document.getElementById('total').textContent = revealed + " of " + total + " found in " + guesses + " guesses in " + time + " seconds";
+            timer.remove(map);
+            score_keep(time);
+        }
+    </script>
+
+    <script> // scorekeeping
+        function score_keep(time){
+            let date = new Date();
+            date = date.toLocaleDateString();
+            axios.post('/score_proximity', {
+                    t: time,
+                    d: date,
+                    f: revealed,
+                    g: guesses
+                })
+        }
+    </script>
+
+
+    <script> // load data
+        var neighbours;
+        fetch('/neighbours')
+            .then(response => response.json())
+            .then(data => {
+                neighbours = data
+            })
+
+        axios.get('/countries.geojson')
+            .then(data => {
+                data = data.data;
+
+                for (let i = 0; i < data[0].features.length; i++){
+                    let country = data[0].features[i];
+                    let name = country.properties.name;
+                    let layer = L.geoJSON(country, {
+                        style: function (feature) {
+                            return {
+                                fillColor: 'blue',
+                                fillOpacity: 0.5,
+                                weight: 1,
+                                color: 'black',
+                                dashArray: '3'
+                            };
+                        }
+                    })
+                    let n = neighbours[name];
+
+                    if (n.length > 0) {
+                        total += 1;
+                        if ('accepted' in country.properties){
+                            country.properties.accepted.forEach(name => {
+                                storage.set(name.toLowerCase(), [layer, n])
+                            });
+                        } else {
+                            storage.set(name.toLowerCase(), [layer, n])
+                        }
+                    }
+                };
+                document.getElementById("start").disabled = false;
+            });
+    </script>
+    
+</body>
+</html>

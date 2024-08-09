@@ -74,6 +74,8 @@
                     let temp = L.geoJSON(country, countryFill);
                     if (show){
                         temp.bindPopup("Country: " + country.properties.name + "<br>Capital: " + capital.properties.name);
+                        temp.on('mouseover', function(e) {highlightFeature(e)});
+                        temp.on('mouseout', function(e) {resetHighlight(e)});
                     }
                     temp.addTo(map)
 

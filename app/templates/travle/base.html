@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Travle</title>
+
+    {% include 'head.html' %}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <h1> Travle Game </h1>
+
+    <input id="input" placeholder="Type a country here">
+
+    <div id="map"></div>
+
+    <script>
+        var map = L.map('map', {zoomControl: false, preferCanvas: true, attributionControl: false}).setView([30, 0], 3);
+    
+        // function to set colours and get the right layers to the front
+        function setColor(layer, c, d, l){
+            layer.setStyle({
+                fillColor: c,
+                color: l,
+                dashArray: d
+            });
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputField = document.getElementById('input')
+            inputField.addEventListener('keypress', function(event) {
+                if (event.keyCode === 13) {
+                    const guess = inputField.value.toLowerCase();
+                    if (storage.has(guess)){
+                        storage.get(guess)[0].addTo(map);
+                        
+                        storage.get(guess)[1].forEach(element => {
+                            storage.get(element.toLowerCase())[0].addTo(map)
+                        });
+                        
+                    }
+
+
+
+                    inputField.value = ""
+                }
+
+            })
+        })
+
+        var storage = new Map();
+        var alt_names = new Map();
+        var neighbours;
+        fetch('/neighbours')
+            .then(response => response.json())
+            .then(data => {
+                neighbours = data
+            })
+
+        axios.get('/countries.geojson')
+            .then(data => {
+                data = data.data;
+
+                for (let i = 0; i < data[0].features.length; i++){
+                    let country = data[0].features[i];
+                    let name = country.properties.name;
+                    let layer = L.geoJSON(country, {
+                        style: function (feature) {
+                            return {
+                                fillColor: 'blue',
+                                fillOpacity: 0.5,
+                                weight: 1,
+                                color: 'black',
+                                dashArray: '3'
+                            };
+                        }
+                    })
+                    let n = neighbours[name];
+
+                    if ('accepted' in country.properties){
+                        country.properties.accepted.forEach(name => {
+                            storage.set(name.toLowerCase(), [layer, n])
+                        });
+                    } else {
+                        storage.set(name.toLowerCase(), [layer, n])
+                    }
+                };
+                
+            });
+    </script>
+    
+</body>
+</html>

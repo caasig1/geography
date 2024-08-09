@@ -8,7 +8,7 @@
         <!-- continent is either NONE (for subdivisions), a continent ie NA or EU, or ALL (for world) -->
         <meta id="score_path" path="{% block score_path %} Default {% endblock %}">
         <!-- path to the right file for score keeping purposes -->
-        <meta id="type" content="{% block type %}country{% endblock %}">
+        <meta id="type" content="{% block type %}subd{% endblock %}">
         <!-- whether it is country or capital (not used for subdivisions) (not used for countries due to it auto being country) -->
         <meta name="map-init" vert="{% block vert %} 0 {% endblock %}" hor="{% block hor %} 0 {% endblock %}" zoom="{% block zoom %} 0 {% endblock %}">
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -205,7 +205,7 @@
                                     to_add.accepted = [layer.feature.properties.name]
                                 }
                                 store.push(to_add)
-                            } else {
+                            } else if (quiz_type === 'capitals') {
                                 if ('accepted' in capital.properties){
                                     to_add.accepted = capital.properties.accepted
                                 } else {

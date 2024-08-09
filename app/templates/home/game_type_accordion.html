@@ -29,4 +29,37 @@
             {% include 'home/subdivision_accordion.html' %}
         </div>
     </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#travle" aria-expanded="false" aria-controls="travle">
+                Travle Replica Attempt
+            </button>
+        </h2>
+        <div id="travle" class="accordion-collapse collapse" data-bs-parent="#base">
+            <a href="{{ url_for('travle') }}"> Travle Game </a>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#proximity" aria-expanded="false" aria-controls="proximity">
+                Proximity Quiz
+            </button>
+        </h2>
+        <div id="proximity" class="accordion-collapse collapse" data-bs-parent="#base">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td> <a href="{{ url_for('proximity') }}"> Proximity Game </a> </td>
+                        <td> 
+                            <a id="proximity_country_score"></a>
+                            <script>
+                                document.getElementById('proximity_country_score').textContent = getProxScore("{{ url_for('static', filename='score/proximity/countries') }}")
+                            </script>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
 </div>
