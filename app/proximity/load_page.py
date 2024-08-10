@@ -14,8 +14,6 @@ def score_proximity():
     guesses = request.json['g']
     
     path = os.path.join(app.static_folder, 'score\proximity\countries')
-    print(path)
-    print(app.static_folder)
 
     s = []
     if os.path.isfile(path):

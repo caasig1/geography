@@ -34,4 +34,24 @@
             }
         }
     }
+
+    function getTravleScore(path){
+        var result;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", path, false);
+        xmlhttp.send();
+        if (xmlhttp.status == 200) {
+            result = xmlhttp.responseText;
+            if (result) {
+                temp = result.split('\n').shift();
+                temp = temp.split(",")
+                result = temp[0] + " perfect clearances"
+                return result
+            } else {
+                return "0 perfect clearances"
+            }
+        }
+    }
+
+    
 </script>

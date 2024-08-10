@@ -36,7 +36,19 @@
             </button>
         </h2>
         <div id="travle" class="accordion-collapse collapse" data-bs-parent="#base">
-            <a href="{{ url_for('travle') }}"> Travle Game </a>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td> <a href="{{ url_for('travle') }}"> Travle Game </a> </td>
+                        <td> 
+                            <a id="travle_score"></a>
+                            <script>
+                                document.getElementById('travle_score').textContent = getTravleScore("{{ url_for('static', filename='score/proximity/travle') }}")
+                            </script>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="accordion-item">

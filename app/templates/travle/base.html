@@ -151,6 +151,12 @@
             document.getElementById('total').textContent = "You took " + guesses + " guesses";
             document.getElementById('ideal').textContent = "Optimally, it takes " + ideal + " guesses";
             show_all.addTo(map);
+
+            if (guesses === ideal){
+                axios.post('/score_travle', {
+                    success: 'yes'
+                })
+            }
         }
     </script>
 
