@@ -10,15 +10,22 @@
 <body>
     {% include 'nav_bar.html' %}
 
-    <h1> Travle Game </h1>
+    <h1> Travle </h1>
 
-    <input id="input" placeholder="Type a country here">
+    <h2 id="tofrom"></h2>
 
     <div id="map"></div>
 
-    <script>
+    <script> // global variables
         var map = L.map('map', {zoomControl: false, preferCanvas: true, attributionControl: false}).setView([30, 0], 3);
-    
+        var storage = new Map();
+        var done = false;
+        var guesses = 0;
+        var neighbours, country_one, country_two, ideal;
+        var opened = new Set();
+        var reached = new Set();
+        var show_all = L.layerGroup();
+
         // function to set colours and get the right layers to the front
         function setColor(layer, c, d, l){
             layer.setStyle({
@@ -29,32 +36,149 @@
         }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const inputField = document.getElementById('input')
-            inputField.addEventListener('keypress', function(event) {
-                if (event.keyCode === 13) {
-                    const guess = inputField.value.toLowerCase();
-                    if (storage.has(guess)){
-                        storage.get(guess)[0].addTo(map);
+    <script> // create stats div in top left
+        var stats = L.control({position: 'topleft'});
+        stats.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            div.innerHTML = `
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
+            `
+            return div;
+        }
+        stats.addTo(map)
+    </script>
+
+    <script> // start button
+        function start() {
+            stats._container.innerHTML = `
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Type a country here" aria-label="Guess" aria-describedby="submit" id="input" autocomplete="off">
+                    <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
+                </div>
+                <h2 id="total">Default</h2>
+            `
+            document.getElementById('input').addEventListener('keydown', function(e) {handleKeyPress(e)});
+            document.getElementById('submit').addEventListener('click', function(e) {submit_guess()});
+            document.getElementById('total').textContent = guesses + " guesses used";
+            document.getElementById('tofrom').textContent = "From " + country_one + " to " + country_two;
+
+            storage.get(country_one.toLowerCase())[0].addTo(map);
+            setColor(storage.get(country_one.toLowerCase())[0], 'green', '', 'white');
+            storage.get(country_two.toLowerCase())[0].addTo(map);
+            setColor(storage.get(country_two.toLowerCase())[0], 'purple', '', 'white');
+
+            opened.add(country_two);
+            reached.add(country_one);
+            neighbours[country_one].forEach(element => {
+                reached.add(element)
+            });
+        }
+    </script>
+
+    <script> // give up button
+        function give_up(){
+            end_game();
+        }
+    </script>
+
+    <script> // handle enter
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) {
+                submit_guess();
+            }
+        }
+
+        function submit_guess() {
+            const inputField = document.getElementById('input');
+            
+            const guess = inputField.value.toLowerCase();
+            if (storage.has(guess)){
+                let curr_layer = storage.get(guess)[0]
+                if (!map.hasLayer(curr_layer)){
+                    curr_layer.addTo(map);
+                    setColor(curr_layer, 'red', '', 'white');
+                    guesses += 1;
+                    
+                    curr_layer.eachLayer(function(layer) {
+                        let name = layer.feature.properties.name
                         
-                        storage.get(guess)[1].forEach(element => {
-                            storage.get(element.toLowerCase())[0].addTo(map)
-                        });
-                        
-                    }
+                        if (reached.has(name)) {
+                            let to_add = neighbours[name];
+                            for (let i = 0; i < to_add.length; i++){
+                                const check = to_add[i];
+                                if (opened.has(check)){
+                                    opened.delete(check);
+                                    neighbours[check].forEach(element => {
+                                        to_add.push(element);
+                                    });
+                                }
+                            }
 
+                            to_add.forEach(element => {
+                                reached.add(element);
+                            });
+                        } else {
+                            opened.add(name);
+                        }
+                    })
 
-
-                    inputField.value = ""
+                    update_score();
                 }
+                
+            }
+            inputField.value = ""
+        }
 
-            })
-        })
+        function update_score() {
+            document.getElementById('total').textContent = guesses + " guesses";
+            console.log("Opened", opened);
+            console.log("Reached", reached)
+            
+            
+            if (reached.has(country_two)){ 
+                end_game();
+            }
+        }
+    </script>
 
-        var storage = new Map();
-        var alt_names = new Map();
-        var neighbours;
+    <script> // end the game
+        function end_game() {
+            done = true;
+            stats._container.innerHTML = `
+                <h2 id="total"></h2>
+                <h2 id="ideal"></h2>
+            `
+            document.getElementById('total').textContent = "You took " + guesses + " guesses";
+            document.getElementById('ideal').textContent = "Optimally, it takes " + ideal + " guesses";
+            show_all.addTo(map);
+        }
+    </script>
+
+    <script> // find ideal guesses
+        function find_ideal() {
+            let steps = 0;
+            let seen = new Set([country_one]);
+            let recently_added = new Set([country_one]);
+            while (!seen.has(country_two)){
+                let next_added = new Set();
+                for(const seen_country of recently_added){
+                    neighbours[seen_country].forEach(add => {
+                        if (!seen.has(add)) {
+                            next_added.add(add);
+                            seen.add(add);
+                        }
+                    });
+                }
+                recently_added = next_added;
+                steps += 1;
+            }
+            console.log(steps);
+            
+            ideal = steps - 1;
+        }
+    </script>
+
+    <script> // load data
         fetch('/neighbours')
             .then(response => response.json())
             .then(data => {
@@ -64,6 +188,9 @@
         axios.get('/countries.geojson')
             .then(data => {
                 data = data.data;
+
+                let americas_list = [];
+                let other_list = [];
 
                 for (let i = 0; i < data[0].features.length; i++){
                     let country = data[0].features[i];
@@ -79,17 +206,52 @@
                             };
                         }
                     })
+                    layer.addTo(show_all);
                     let n = neighbours[name];
 
-                    if ('accepted' in country.properties){
-                        country.properties.accepted.forEach(name => {
+                    let remove = new Set(["United Kingdom", "Ireland", "Haiti", "Dominican Republic"]);
+
+                    if (n.length > 0 && !remove.has(name)) {
+                        if (country.properties.continent === "NA" || country.properties.continent === "SA"){
+                            americas_list.push(country.properties.name);
+                        } else {
+                            other_list.push(country.properties.name);
+                        }
+
+                        if ('accepted' in country.properties){
+                            country.properties.accepted.forEach(name => {
+                                storage.set(name.toLowerCase(), [layer, n])
+                            });
+                        } else {
                             storage.set(name.toLowerCase(), [layer, n])
-                        });
-                    } else {
-                        storage.set(name.toLowerCase(), [layer, n])
+                        }
                     }
                 };
                 
+                let land_choice = Math.floor(Math.random() * 153);
+                let pick;
+                if (land_choice < 22){
+                    pick = americas_list;
+                } else {
+                    pick = other_list;
+                }
+                let keys = pick;
+                let first_choice = Math.floor(Math.random() * keys.length);
+                country_one = keys[first_choice];
+                
+                keys.splice(first_choice, 1)
+                to_remove = neighbours[keys[first_choice]];
+                to_remove.forEach(element => {
+                    const index = keys.indexOf(element);
+                    keys.splice(index, 1);
+                });
+                
+                let second_choice = Math.floor(Math.random() * keys.length);
+                country_two = keys[second_choice];
+
+                find_ideal();
+
+                document.getElementById("start").disabled = false;
             });
     </script>
     
