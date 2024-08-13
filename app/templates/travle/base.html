@@ -25,6 +25,9 @@
         var opened = new Set();
         var reached = new Set();
         var show_all = L.layerGroup();
+        var americas_list = [];
+        var other_list = [];
+        var path;
 
         // function to set colours and get the right layers to the front
         function setColor(layer, c, d, l){
@@ -50,6 +53,9 @@
 
     <script> // start button
         function start() {
+            if(map.hasLayer(show_all)){
+                map.removeLayer(show_all);
+            }
             stats._container.innerHTML = `
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="Type a country here" aria-label="Guess" aria-describedby="submit" id="input" autocomplete="off">
@@ -62,13 +68,22 @@
             document.getElementById('total').textContent = guesses + " guesses used";
             document.getElementById('tofrom').textContent = "From " + country_one + " to " + country_two;
 
+            show_all.eachLayer(layer => {
+                layer.eachLayer(i => {
+                    if (i.feature.properties.name === country_one) {
+                        setColor(i, 'green', '', 'white');
+                    } else if (i.feature.properties.name === country_two) {
+                        setColor(i, 'purple', '', 'white');
+                    } else {
+                        setColor(i, 'blue', '3', 'black');
+                    }
+                })
+            })
             storage.get(country_one.toLowerCase())[0].addTo(map);
-            setColor(storage.get(country_one.toLowerCase())[0], 'green', '', 'white');
             storage.get(country_two.toLowerCase())[0].addTo(map);
-            setColor(storage.get(country_two.toLowerCase())[0], 'purple', '', 'white');
 
-            opened.add(country_two);
-            reached.add(country_one);
+            opened = new Set([country_two]);
+            reached = new Set([country_one]);
             neighbours[country_one].forEach(element => {
                 reached.add(element)
             });
@@ -131,9 +146,6 @@
 
         function update_score() {
             document.getElementById('total').textContent = guesses + " guesses";
-            console.log("Opened", opened);
-            console.log("Reached", reached)
-            
             
             if (reached.has(country_two)){ 
                 end_game();
@@ -147,6 +159,7 @@
             stats._container.innerHTML = `
                 <h2 id="total"></h2>
                 <h2 id="ideal"></h2>
+                <button onClick="start()"> Play again </button>
             `
             document.getElementById('total').textContent = "You took " + guesses + " guesses";
             document.getElementById('ideal').textContent = "Optimally, it takes " + ideal + " guesses";
@@ -156,7 +169,12 @@
                 axios.post('/score_travle', {
                     success: 'yes'
                 })
+            } else {
+                path.forEach(country => {
+                    storage.get(country.toLowerCase())[0].setStyle({ color: "yellow", weight: 3 })
+                });
             }
+            choose_locations();
         }
     </script>
 
@@ -164,6 +182,7 @@
         function find_ideal() {
             let steps = 0;
             let seen = new Set([country_one]);
+            let layers = [];
             let recently_added = new Set([country_one]);
             while (!seen.has(country_two)){
                 let next_added = new Set();
@@ -174,13 +193,59 @@
                             seen.add(add);
                         }
                     });
-                }
+                };
                 recently_added = next_added;
+                layers.push(recently_added);
                 steps += 1;
             }
-            console.log(steps);
+
+            path = [];
+            layers.pop();
+            let last = country_two;
+
+            while (layers.length > 0){
+                const n = neighbours[last];
+                for (const c of n) {
+                    
+                    if (layers[layers.length -1].has(c)) {
+                        last = c;
+                        path.push(c);
+                        layers.pop();
+                        break;
+                    };
+                };
+            };
             
             ideal = steps - 1;
+        }
+    </script>
+
+    <script> // choose start and destination
+        function choose_locations() {
+            guesses = 0;
+            let land_choice = Math.floor(Math.random() * 153);
+            let pick;
+            if (land_choice < 22){
+                pick = americas_list;
+            } else {
+                pick = other_list;
+            }
+            let keys = pick.slice();
+            let first_choice = Math.floor(Math.random() * keys.length);
+            country_one = keys[first_choice];
+            
+            to_remove = neighbours[keys[first_choice]];
+            
+            keys.splice(first_choice, 1);
+            to_remove.forEach(element => {
+                const index = keys.indexOf(element);
+                keys.splice(index, 1);
+            });
+
+            let second_choice = Math.floor(Math.random() * keys.length);
+            country_two = keys[second_choice];
+
+            find_ideal();
         }
     </script>
 
@@ -194,9 +259,6 @@
         axios.get('/countries.geojson')
             .then(data => {
                 data = data.data;
-
-                let americas_list = [];
-                let other_list = [];
 
                 for (let i = 0; i < data[0].features.length; i++){
                     let country = data[0].features[i];
@@ -233,30 +295,8 @@
                         }
                     }
                 };
-                
-                let land_choice = Math.floor(Math.random() * 153);
-                let pick;
-                if (land_choice < 22){
-                    pick = americas_list;
-                } else {
-                    pick = other_list;
-                }
-                let keys = pick;
-                let first_choice = Math.floor(Math.random() * keys.length);
-                country_one = keys[first_choice];
-                
-                keys.splice(first_choice, 1)
-                to_remove = neighbours[keys[first_choice]];
-                to_remove.forEach(element => {
-                    const index = keys.indexOf(element);
-                    keys.splice(index, 1);
-                });
-                
-                let second_choice = Math.floor(Math.random() * keys.length);
-                country_two = keys[second_choice];
 
-                find_ideal();
-
+                choose_locations();
                 document.getElementById("start").disabled = false;
             });
     </script>

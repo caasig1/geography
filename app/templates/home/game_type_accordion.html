@@ -32,7 +32,7 @@
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#travle" aria-expanded="false" aria-controls="travle">
-                Travle Replica Attempt
+                Travle Game
             </button>
         </h2>
         <div id="travle" class="accordion-collapse collapse" data-bs-parent="#base">
@@ -66,6 +66,29 @@
                             <a id="proximity_country_score"></a>
                             <script>
                                 document.getElementById('proximity_country_score').textContent = getProxScore("{{ url_for('static', filename='score/proximity/countries') }}")
+                            </script>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#shapes" aria-expanded="false" aria-controls="shapes">
+                Shape Guessing Game
+            </button>
+        </h2>
+        <div id="shapes" class="accordion-collapse collapse" data-bs-parent="#base">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td> <a href="{{ url_for('shapes') }}"> Shape Guessing Game </a> </td>
+                        <td> 
+                            <a id="shapes_country_score"></a>
+                            <script>
+                                document.getElementById('shapes_country_score').textContent = getProxScore("{{ url_for('static', filename='score/proximity/countries') }}")
                             </script>
                         </td>
                     </tr>

@@ -10,4 +10,5 @@ from app.learning import countries, subdivisions_na, capitals, subdivisions_sa
 from app.typing import countries, subdivisions_na, capitals, subdivisions_sa
 from app.travle import load_page
 from app.proximity import load_page
+from app.shapes import load_page
 from app.scorekeeping import score

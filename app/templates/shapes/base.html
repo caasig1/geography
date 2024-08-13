@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Shape Guessing</title>
+
+    {% include 'head.html' %}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <style>
+        .popup {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 9999; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(43, 43, 43, 0.301); /* Black background with opacity */
+        }
+
+        /* Popup content */
+        .popup-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            position: relative; /* For positioning the close button */
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    {% include 'nav_bar.html' %}
+
+    <h1> Shape Guessing </h1>
+
+    <script>
+        // When the user clicks on div, open the popup
+        function toggle_stats() {
+            var popup = document.getElementById("stats");
+            popup.classList.toggle("show");
+        }
+
+        function get_stats() {
+            let ret = "";
+            fetch("{{ url_for('static', filename='score/shapes.json') }}")
+                .then((response) => response.json())
+                .then((json) => {
+                    for (entry in json){
+                        ret = ret.concat(entry, " : ", json[entry], "\n");
+                    };
+                    document.getElementById('stats').textContent = ret;
+                })
+        }
+    </script>
+
+    <button class="btn btn-outline-secondary" id="openPopup">User Statistics</button>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <a id="stats">Default</a>
+        </div>
+    </div>
+    <script>
+        get_stats();
+
+        const popup = document.getElementById('popup');
+        const openPopupButton = document.getElementById('openPopup');
+
+        openPopupButton.onclick = function() {
+            popup.style.display = 'block';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == popup) {
+                popup.style.display = 'none';
+            }
+        }
+    </script>
+
+    <div id="map"></div>
+
+    <script> // global variables ////// idea! score can be kept as a json for how many attempts before a correct one is guessed -- can apply this to travle
+        var map = L.map('map', {zoomControl: false, preferCanvas: true, attributionControl: false}).setView([30, 0], 3);
+        map.scrollWheelZoom.disable();
+        map.dragging.disable();
+        map.doubleClickZoom.disable();
+        var storage = new Map();
+        var guesses = 0;
+        var country_names = [];
+        var target = new Set();
+        var target_layer;
+    </script>
+
+    <script> // create stats div in top left
+        var stats = L.control({position: 'topleft'});
+        stats.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            div.innerHTML = `
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
+            `
+            return div;
+        }
+        stats.addTo(map)
+    </script>
+
+    <script> // start button
+        function start() {
+            stats._container.innerHTML = `
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Type a country here" aria-label="Guess" aria-describedby="submit" id="input" autocomplete="off">
+                    <button class="btn btn-outline-secondary" type="button" id="submit">Enter</button>
+                </div>
+            `
+            document.getElementById('input').addEventListener('keydown', function(e) {handleKeyPress(e)});
+            document.getElementById('submit').addEventListener('click', function(e) {submit_guess()});
+        }
+    </script>
+
+    <script> // handle enter
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) {
+                submit_guess();
+            }
+        }
+
+        function submit_guess() {
+            const inputField = document.getElementById('input');
+            
+            const guess = inputField.value.toLowerCase();
+            
+            // if guessed the correct country
+            if (target.has(guess)){
+                guesses += 1;
+                end_game();
+
+            } else if (storage.has(guess)) {
+                guesses += 1;
+            }
+
+            inputField.value = ""
+        }
+    </script>
+
+    <script> // end the game
+        function end_game() {
+            // send how many attempts it took to python scorekeeper
+            axios.post('/score_shapes', {
+                score: guesses
+            })
+            // regenerate start button
+            guesses = 0;
+            target = new Set();
+            map.removeLayer(target_layer);
+            stats._container.innerHTML = `
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
+            `
+            pick_country();
+        }
+    </script>
+    
+    <script> // pick a country
+        function pick_country() {
+            const choice = Math.floor(Math.random() * country_names.length);
+            let c_name = country_names[choice];
+            let new_zoom;
+
+            storage.get(c_name).eachLayer(layer => {
+                if ('accepted' in layer.feature.properties){
+                    layer.feature.properties.accepted.forEach(element => {
+                        target.add(element.toLowerCase());
+                    });
+                } else {
+                    target.add(c_name.toLowerCase());
+                }
+                target_layer = layer
+                layer.addTo(map); // need to remove too when guessed
+                new_zoom = layer.getBounds();
+            })
+            
+            map.fitBounds(new_zoom);
+            document.getElementById("start").disabled = false;
+        }
+    </script>
+
+    <script> // load data
+        axios.get('/countries.geojson')
+            .then(data => {
+                data = data.data;
+
+
+                for (let i = 0; i < data[0].features.length; i++){
+                    let country = data[0].features[i];
+                    let name = country.properties.name;
+                    let layer = L.geoJSON(country, {
+                        style: function (feature) {
+                            return {
+                                fillColor: 'blue',
+                                fillOpacity: 0.5,
+                                weight: 1,
+                                color: 'black',
+                                dashArray: '3'
+                            };
+                        }
+                    })
+
+                    country_names.push(name.toLowerCase())
+
+                    if ('accepted' in country.properties){
+                        country.properties.accepted.forEach(name => {
+                            storage.set(name.toLowerCase(), layer)
+                        });
+                    } else {
+                        storage.set(name.toLowerCase(), layer)
+                    }
+                };
+
+                pick_country();
+            });
+    </script>
+    
+</body>
+</html>
