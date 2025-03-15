@@ -132,6 +132,9 @@ def subdivision_na():
             
             if data['type'] == 'FeatureCollection':
                 geodata.extend(data['features'])
+                if 'country' in data:
+                    for feature in data['features']:
+                        feature.properties['country'] = data['country']
             elif data['type'] == 'Feature':
                 geodata.append(data)
     

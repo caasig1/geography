@@ -164,6 +164,7 @@
         axios.get('/countries.geojson')
             .then(data => {
                 data = data.data;
+                let resize = geodata.slice(2, -9).replace("_", " ");
 
                 for (let i = 0; i < data[0].features.length; i++){
                     let country = data[0].features[i]
@@ -201,7 +202,7 @@
                             }
                         }).addTo(map)
                     } else {
-                        L.geoJSON(country, {
+                        let c =L.geoJSON(country, {
                             style: function (feature) {
                                 return {
                                     fillOpacity: 0,
@@ -210,7 +211,11 @@
                                     dashArray: ''
                                 };
                             }
-                        }).addTo(map)
+                        })
+                        c.addTo(map);
+                        if (country.properties.name.toLowerCase() === resize){
+                            map.fitBounds(c.getBounds());
+                        };
                     }
                 };
 

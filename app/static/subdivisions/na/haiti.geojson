@@ -185,7 +185,7 @@
         "source": "https://simplemaps.com",
         "id": "HTCE",
         "name": "Centre",
-        "accepted": ["Centre", "Center"]
+        "accepted": ["Centre", "Center", "Central"]
       },
       "id": 2
     },
@@ -1227,7 +1227,7 @@
         "source": "https://simplemaps.com",
         "id": "HTAR",
         "name": "L'Artibonite",
-        "accepted": ["LArtibonite", "L'Artibonite"]
+        "accepted": ["LArtibonite", "L'Artibonite", "Artibonite"]
       },
       "id": 9
     },
@@ -1336,5 +1336,6 @@
       },
       "id": 10
     }
-  ]
+  ],
+  "country": "Haiti"
 }

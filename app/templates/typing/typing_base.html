@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         {% include 'head.html' %}
-        <meta id="geodata" data="{% block geojson_data %} Default {% endblock %}">
+        <meta id="geodata" data="{% block geojson_data %}Default{% endblock %}">
         <!-- this is only used for subdivisions (map is always drawn with all countries but subdivisions need more data) -->
         <meta name="continent" content="{% block continent %}NONE{% endblock %}">
         <!-- continent is either NONE (for subdivisions), a continent ie NA or EU, or ALL (for world) -->
@@ -23,6 +23,13 @@
 
     {% include 'home/load_map.html' %}
 
+    <div style="overflow-x:auto;">
+        <table id="places_found" style="border: 1px solid black;">
+            <tbody>
+            </tbody>
+        </table>
+      </div>
+
     <script> // handle enter
         function handleKeyPress(event){
             if (event.keyCode === 13) {
@@ -36,6 +43,12 @@
             document.getElementById('answer').value = "";
         }
 
+        function update_table(name, country){
+            let index = table_info[country].indexOf(name);
+            let wanted_cell = document.getElementById(country + index.toString());
+            wanted_cell.innerHTML = name;   
+        }
+
         function handleEnter(value){
             for (let i = 0; i < store.length; i++){
                 let check = store[i];
@@ -45,6 +58,10 @@
                         setColor(check.layer, 'green', '', 'black');
                         document.getElementById('total').textContent = count.toString() + ' of ' + tot + ' correct';
                         store.splice(i, 1);
+
+                        if (table_info.length > 0){
+                            update_table(check.name, check.country);
+                        }
                         break;
                     }
                 }
@@ -66,7 +83,7 @@
     <script> // layers for stats and timer
         var stats = L.control({position: 'topleft'});
         stats.onAdd = function(map) {
-            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light fixed');
             div.innerHTML = `
                 <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
             `
@@ -129,15 +146,15 @@
         var store = [];
         var count = 0;
         var tot = 0;
-        var geodata = document.getElementById('geodata').getAttribute('data')
-        var quiz_type = document.getElementById('type').getAttribute('content')
+        var geodata = document.getElementById('geodata').getAttribute('data');
+        var quiz_type = document.getElementById('type').getAttribute('content');
+        var table_info = {};
 
         if (continent === "NONE") {
-            // subdivision
+            // subdivision quizzes
             axios.get(geodata)
                 .then(data => {
                     data = data.data;
-
                     for (let i = 0; i < data.features.length; i++){
                         let subd = data.features[i]
                         
@@ -153,20 +170,49 @@
                             }
                         }).addTo(map)
                         
-                        temp.eachLayer(layer => {
+                        temp.eachLayer(layer => { // add to 'store' variable that holds all info
                             let to_add = {};
-                            to_add.layer = layer
+                            to_add.layer = layer;
                             if ('accepted' in layer.feature.properties){
-                                to_add.accepted = layer.feature.properties.accepted
+                                to_add.accepted = layer.feature.properties.accepted;
                             } else {
-                                to_add.accepted = [layer.feature.properties.name]
+                                to_add.accepted = [layer.feature.properties.name];
+                            };
+                            to_add.name = layer.feature.properties.name;
+
+                            if ('country' in layer.feature.properties){
+                                to_add.country = layer.feature.properties.country;
+                                if (layer.feature.properties.country in table_info){
+                                    table_info[layer.feature.properties.country].push(layer.feature.properties.name);
+                                } else {
+                                    table_info[layer.feature.properties.country] = [layer.feature.properties.name];
+                                }
                             }
-                            store.push(to_add)
-                        })
+                            store.push(to_add);
+                        });
                     };
+                    
+                    // table info
+                    for (let country in table_info){
+                        const tableBody = document.getElementById('places_found').getElementsByTagName('tbody')[0];
+                        const newRow = tableBody.insertRow();
+                        table_info[country].sort();
+                        // country
+                        let c = newRow.insertCell();
+                        c.style.border = "3px solid black";
+                        c.textContent = country;
+
+                        for (let place in table_info[country]){
+                            let cell = newRow.insertCell();
+                            cell.style.border = "1px solid black";
+                            cell.style.width = "100px";
+                            cell.id = country + place.toString();
+                        }    
+                    }
                 })
         }
 
+        // variable for marker for capitals
         var capitalMarker = {
             radius: 5,
             fillColor: "red",
@@ -174,15 +220,17 @@
             fillOpacity: 1
         };
 
-        axios.get('/countries.geojson')
+        axios.get('/countries.geojson') // initialize countries (either background or for quiz)
             .then(data => {
                 data = data.data;
+                let resize = geodata.slice(2, -9).replace("_", " ");
+                
                 
                 for (let i = 0; i < data[0].features.length; i++){
                     let country = data[0].features[i]
                     let capital = data[1].features[i]
                     
-                    if (country.properties.continent === continent || continent === "ALL") {
+                    if (country.properties.continent === continent || continent === "ALL") { // world countries/capitals
                         let temp = L.geoJSON(country, {
                             style: function (feature) {
                                 return {
@@ -198,6 +246,7 @@
                         temp.eachLayer(layer => {
                             let to_add = {};
                             to_add.layer = layer
+                            // add country or capitals depending on quiz (or none if subdivisions)
                             if (quiz_type == 'country') {
                                 if ('accepted' in layer.feature.properties){
                                     to_add.accepted = layer.feature.properties.accepted
@@ -213,8 +262,10 @@
                                 }
                                 store.push(to_add)
                             }
+                            
                         })
 
+                        // add capital dots
                         L.geoJSON(capital, {
                             pointToLayer: function(feature, coords) {
                                 let c = L.latLng(coords.lng, coords.lat)
@@ -222,7 +273,7 @@
                             }
                         }).addTo(map)
                     } else {
-                        L.geoJSON(country, {
+                        let c = L.geoJSON(country, {
                             style: function (feature) {
                                 return {
                                     fillOpacity: 0,
@@ -231,7 +282,11 @@
                                     dashArray: ''
                                 };
                             }
-                        }).addTo(map)
+                        });
+                        c.addTo(map);
+                        if (country.properties.name.toLowerCase() === resize){
+                            map.fitBounds(c.getBounds());
+                        };
                     }
                 };
                 
@@ -239,20 +294,20 @@
             });
     </script>
 
-<script> // scorekeeping
-    function score_keep(score){
-        let score_path = document.querySelector('#score_path').getAttribute('path')
-        let time = document.querySelector('#clock').textContent;
-        let date = new Date();
-        date = date.toLocaleDateString();
-        axios.post('/score', {
-                t: time,
-                d: date,
-                s: score,
-                type: 'typing',
-                score: score_path
-            })
-    }
-</script>
+    <script> // scorekeeping
+        function score_keep(score){
+            let score_path = document.querySelector('#score_path').getAttribute('path')
+            let time = document.querySelector('#clock').textContent;
+            let date = new Date();
+            date = date.toLocaleDateString();
+            axios.post('/score', {
+                    t: time,
+                    d: date,
+                    s: score,
+                    type: 'typing',
+                    score: score_path
+                })
+        }
+    </script>
 </body>
 </html>
