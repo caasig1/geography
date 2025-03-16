@@ -34,10 +34,21 @@
         }
         stats.addTo(map)
 
+        var timer = L.control({position: 'topright'});
+        timer.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
+            div.innerHTML = `
+                <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+            `
+            return div;
+        }
+        timer.addTo(map);
+
         function start() {
             stats._container.innerHTML = `
                 <h2 id="location">Default</h2>
                 <h2 id="correct">Accuracy: 100.0%</h2>
+                <button type="button" class="btn btn-outline-info" id="start" onclick="reset()"> Restart </button>
             `;
 
             document.getElementById('location').textContent = find;
@@ -51,15 +62,7 @@
                 })
             });
 
-            var timer = L.control({position: 'topright'});
-            timer.onAdd = function(map) {
-                var div = L.DomUtil.create('div', 'leaflet-control custom-control bg-light');
-                div.innerHTML = `
-                    <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
-                `
-                return div;
-            }
-            timer.addTo(map);
+            done = false;
             updateTimer(new Date());
         }
 
@@ -118,13 +121,13 @@
         }
     </script>
 
-    <script> // initializing data
+    <script> // gathering data
         var continent = document.querySelector('meta[name="continent"]').getAttribute('content');
         var find;
-        var territories = L.layerGroup()
-        var geodata = document.getElementById('geodata').getAttribute('data')
+        var territories = L.layerGroup();
+        var geodata = document.getElementById('geodata').getAttribute('data');
         var locations = [];
-        var quiz_type = document.getElementById('type').getAttribute('content')
+        var quiz_type = document.getElementById('type').getAttribute('content');
 
         if (continent === "NONE") {
             // subdivision
@@ -244,6 +247,37 @@
                     type: 'clicking',
                     score: score_path
                 })
+        }
+    </script>
+    
+    <script> // reset
+        function reset(){
+            reset_map();
+            done = true;
+
+            stats._container.innerHTML = `
+                <button type="button" class="btn btn-outline-info" id="start" onclick="start()" disabled=true> Start </button>
+            `;
+            timer._container.innerHTML = `
+                <h1 style='font-weight: bold;' id='clock'> 0:00 </h1>
+            `
+
+            axios.post('/reset', {})
+            .then(loc => {
+                find = loc.data.first;
+            });
+            document.getElementById("start").disabled = false
+        }
+        function reset_map(){
+            territories.eachLayer(layer => {
+                layer.setStyle({
+                    fillColor: 'blue',
+                    fillOpacity: 0.5,
+                    weight: 1,
+                    color: 'black',
+                    dashArray: '3'
+                });
+            });
         }
     </script>
 </body>

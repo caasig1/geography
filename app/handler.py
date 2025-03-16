@@ -8,7 +8,8 @@ import random
 def collect():
     session['vals'] = request.json['locations']
     random.shuffle(session['vals'])
-    session['to_find'] = session['vals'].pop()
+    session['find_index'] = 0
+    session['to_find'] = session['vals'][session['find_index']]
     session['total_clicks'] = 0
     session['correct_clicks'] = 0
     return jsonify({'first': "Please click on " + str(session['to_find'])})
@@ -23,8 +24,9 @@ def click():
     # Process the input_value as needed (e.g., perform calculations, database operations, etc.)
     if session['to_find'] == input_value:
         color = 'green'
-        if session['vals']:
-            next = session['vals'].pop()
+        if session['find_index'] < len(session['vals']) - 1:
+            session['find_index'] += 1
+            next = session['vals'][session['find_index']]
         else:
             color = 'black'
             next = '1'
@@ -42,6 +44,15 @@ def click():
                         'percent' : p,
                         'total' : session['correct_clicks']
                     })
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    session['find_index'] = 0
+    random.shuffle(session['vals'])
+    session['to_find'] = session['vals'][session['find_index']]
+    session['total_clicks'] = 0
+    session['correct_clicks'] = 0
+    return jsonify({'first': "Please click on " + str(session['to_find'])})
 
 @app.route('/neighbours')
 def get_neighbours():
